@@ -17,16 +17,16 @@ colors = {
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Hello world!')
 
-basicFont = pygame.font.SysFont(None, 48)
+basicFont = pygame.font.Font('../resources/alphbeta.ttf', 48)
 
 def printCoords(x,y):
-	text = basicFont.render('X:{0} Y:{1}'.format(x,y), True, colors['white'], colors['blue'])
+	text = basicFont.render('X:{0} Y:{1}'.format(x,y), False, colors['white'], colors['blue'])
 	screen.blit(text, (x,y))
 	return True
 
 def main(argv):
 
-	text = basicFont.render('Hello world!', True, colors['white'], colors['blue'])
+	text = basicFont.render('Hello world!', False, colors['white'], colors['blue'])
 	textRect = text.get_rect()
 	textRect.centerx = screen.get_rect().centerx
 	textRect.centery = screen.get_rect().centery
