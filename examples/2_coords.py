@@ -17,7 +17,7 @@ colors = {
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Hello world!')
 
-basicFont = pygame.font.SysFont("Comic Sans", 48)
+basicFont = pygame.font.SysFont(None, 48)
 
 def printCoords(x,y):
 	text = basicFont.render('X:{0} Y:{1}'.format(x,y), True, colors['white'], colors['blue'])
