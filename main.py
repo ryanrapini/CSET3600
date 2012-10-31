@@ -1,26 +1,53 @@
 import sys, pygame
 from pygame.locals import *
 
-pygame.init()
-fpsClock = pygame.time.Clock()
+class Ship:
+	"""Generates a single battleship."""
+	def __init__(self):
+		self.size = 0
 
-size = width, height = 1024, 768
-speed = [2, 2]
+	def set(self, values):
 
-colors = {
+
+def init():
+	pygame.init()
+	global fpsClock 
+	fpsClock = pygame.time.Clock()
+
+	size = width, height = 800, 600
+	speed = [2, 2]
+
+	colors = {
 	'black' : (0, 0, 0),
 	'white' : (255, 255, 255),
 	'blue' : (0, 0, 255),
 	'red' : (0, 255, 0)
-}
+	}
 
-screen = pygame.display.set_mode(size)
-pygame.display.set_caption('Hello world!')
+	screen = pygame.display.set_mode(size)
+	pygame.display.set_caption('Battleship')
+	return screen
 
-basicFont = pygame.font.Font('resources/alphbeta.ttf', 48)
+def menu():
+	mainFont = pygame.font.Font('resources/alphbeta.ttf', 100)
+
+	background = 'resources/battleship.jpg'
+	background_surface = pygame.image.load(background)
+	screen.blit(background_surface, (0,0))
+	pygame.display.flip() 
+
+	text = mainFont.render('Battleship', False, colors['white'], colors['black'])
+
+	# Create a rectangle
+	textRect = text.get_rect()
+
+
+	# Blit the text
+	screen.blit(text, textRect)
 
 def main(argv):
-	screen.fill(colors['black'])
+	screen = init()
+	gamemode = 0
 	while 1:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT: 
@@ -33,10 +60,8 @@ def main(argv):
 			elif event.type == MOUSEBUTTONUP:
 				mousex, mousey = event.pos
 
-		screen.fill(colors['black'])
-
 		pygame.display.update()
 		fpsClock.tick(30)
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+	main(sys.argv[1:])
