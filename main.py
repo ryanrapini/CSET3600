@@ -106,7 +106,7 @@ def title(screen):
 
 class Button:
 	"""
-	Defines a button 
+	Defines a button for the main menu.
 	"""
 	def __init__(self, position, title, action):
 		self.position = position
