@@ -108,14 +108,18 @@ class Button:
 	"""
 	Defines a button 
 	"""
-	def __init__(self, position, ):
+	def __init__(self, position, title, action):
+		self.position = position
+		self.title = title
+		self.action = action
+
+	def highlighted(self):
 		pass
 
 
 
 def menu(screen, hover):
 	quit = ""
-
 
 def main(argv):
 	screen = init()
