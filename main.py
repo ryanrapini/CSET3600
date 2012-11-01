@@ -69,7 +69,7 @@ def init():
 	return screen
 
 
-def menu(screen):
+def title(screen):
 	# moved text up here for easy access.
 	title = 'Battleshit'
 	subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
@@ -104,6 +104,19 @@ def menu(screen):
 	screen.blit(subtitleText, titleRect)
 
 
+class Button:
+	"""
+	Defines a button 
+	"""
+	def __init__(self, position, ):
+		pass
+
+
+
+def menu(screen, hover):
+	quit = ""
+
+
 def main(argv):
 	screen = init()
 
@@ -111,7 +124,8 @@ def main(argv):
 
 	while 1:
 		if gamemode == 0:
-			menu(screen)
+			title(screen)
+			# menu(screen)
 		elif gamemode == 1:
 			game(screen)
 
