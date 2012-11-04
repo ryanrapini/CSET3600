@@ -15,6 +15,7 @@ def init():
 	'white' : (255, 255, 255),
 	'blue' : (0, 0, 255),
 	'red' : (0, 255, 0)
+	'purple' : (168, 28, 265)
 	}
 
 	screen = pygame.display.set_mode(size)
