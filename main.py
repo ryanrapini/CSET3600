@@ -1,79 +1,109 @@
-import sys, pygame
+import sys, pygame, os, pygame.mixer
+import easygui
+
 from pygame.locals import *
 
+
+pygame.mixer.pre_init(44100, -16, 2, 2048) # setup mixer
+
+#hit = pygame.mixer.Sound(os.path.join('resoureces/hit.wav'))  #load sound
+#miss = pygame.mixer.Sound(os.path.join('resoureces/miss.wav'))  #load sound
+#lasthit = pygame.mixer.Sound(os.path.join('resources/lasthit.wav'))  #load sound
+
+
 def init():
-	pygame.init()
-	global fpsClock 
-	fpsClock = pygame.time.Clock()
+    pygame.init()
+    global fpsClock
+    fpsClock = pygame.time.Clock()
 
-	size = width, height = 800, 600
-	speed = [2, 2]
+    size = width, height = 800, 600
+    speed = [2, 2]
 
-	global color
-	color = {
-	'black' : (0, 0, 0),
-	'white' : (255, 255, 255),
-	'blue' : (0, 0, 255),
-	'red' : (0, 255, 0),
-	'purple' : (168, 28, 265)
-	}
+    global color
+    color = {
+    'black' : (0, 0, 0),
+    'white' : (255, 255, 255),
+    'blue' : (0, 0, 255),
+    'red' : (0, 255, 0)
+    }
 
-	screen = pygame.display.set_mode(size)
-	pygame.display.set_caption('Battleship')
-	return screen
+    screen = pygame.display.set_mode(size)
+    pygame.display.set_caption('Battleship')
 
+    hit = pygame.mixer.Sound(os.path.join('resources/hit.wav')) #load hit sound
+    miss = pygame.mixer.Sound(os.path.join('resources/miss.wav')) #load miss sound
+    lasthit = pygame.mixer.Sound(os.path.join('resources/lasthit.wav')) #load lasthit sound
+    return screen
 
 def title(screen):
-	# moved text up here for easy access.
-	title = 'Battleship'
-	subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
+    # moved text up here for easy access.
+    title = 'Battleship'
+    subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
 
-	# set font
-	mainFont = pygame.font.Font('resources/alphbeta.ttf', 100)
-	subFont = pygame.font.Font('resources/alphbeta.ttf', 30)
+    # set font
+    mainFont = pygame.font.Font('resources/alphbeta.ttf', 100)
+    subFont = pygame.font.Font('resources/alphbeta.ttf', 30)
 
-	# set background
-	background = 'resources/battleship.jpg'
-	background_surface = pygame.image.load(background)
-	screen.blit(background_surface, (0,0))
+    # set background
+    background = 'resources/battleship.jpg'
+    background_surface = pygame.image.load(background)
+    screen.blit(background_surface, (0,0))
 
-	# draw title background
-	titleSurface = pygame.Surface((800,130))
-	# make background transparent and black
-	titleSurface.fill(color['black'])
-	titleSurface.set_alpha(200)
-	screen.blit(titleSurface, (0,0))
+    # draw title background
+    titleSurface = pygame.Surface((800,130))
+    # make background transparent and black
+    titleSurface.fill(color['black'])
+    titleSurface.set_alpha(200)
+    screen.blit(titleSurface, (0,0))
 
-	# draw title text, centered
-	titleText = mainFont.render(title, False, color['white'])
-	titleRect = titleText.get_rect()
-	titleRect.centerx = 400
-	screen.blit(titleText, titleRect)
+    # draw title text, centered
+    titleText = mainFont.render(title, False, color['white'])
+    titleRect = titleText.get_rect()
+    titleRect.centerx = 400
+    screen.blit(titleText, titleRect)
 
-	# draw subtitle text
-	subtitleText = subFont.render(subtitle, False, color['white'])
-	titleRect = subtitleText.get_rect()
-	titleRect.centerx = 400
-	titleRect.top = 90
-	screen.blit(subtitleText, titleRect)
+    # draw subtitle text
+    subtitleText = subFont.render(subtitle, False, color['white'])
+    titleRect = subtitleText.get_rect()
+    titleRect.centerx = 400
+    titleRect.top = 90
+    screen.blit(subtitleText, titleRect)
 
+##class Button:
+##      """
+##      Defines a button for the main menu.
+##      """
+##      def __init__(self, position, title, action):
+##      self.position = position
+##          self.title = title
+##      self.action = action
+##
+##      def highlighted(self):
+##      pass
+##
 
-class Button:
-	"""
-	Defines a button for the main menu.
-	"""
-	def __init__(self, position, title, action):
-		self.position = position
-		self.title = title
-		self.action = action
-
-	def highlighted(self):
-		pass
-
-
-
-def menu(screen, hover):
-	quit = ""
+def menu():
+    resolution = [640,480]
+    msg = "This is BattleShip!"
+    buttons = ["Single Player Game", "Network Game", "Quit"]
+    picture = None # gif file
+    while True: #endless loop
+        title = "Welcome To BattleShip! Developed by Team Lazer Explosion!"
+        selection = easygui.buttonbox(msg, title, buttons, picture)
+        if selection == "Quit":
+            easygui.msgbox("Quitter!")
+            break # leave loop
+        elif selection == "Single Player Game":
+            msg = "Single Player Game Selected." #load board and AI
+            break
+        elif selection == "Network Game":
+            msg = "Multiplayer Game Selected."
+            break
+            ##load board and netcoding 
+    return 
+ 
+if __name__ == '__main__':
+    menu()
 
 def main(argv):
 	screen = init()
@@ -83,7 +113,7 @@ def main(argv):
 	while 1:
 		if gamemode == 0:
 			title(screen)
-			# menu(screen)
+			menu()
 		elif gamemode == 1:
 			game(screen)
 
@@ -103,3 +133,4 @@ def main(argv):
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
+
