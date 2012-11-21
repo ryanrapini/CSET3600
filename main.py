@@ -69,20 +69,31 @@ def title(screen):
     titleRect.top = 90
     screen.blit(subtitleText, titleRect)
 
-##class Button:
-##      """
-##      Defines a button for the main menu.
-##      """
-##      def __init__(self, position, title, action):
-##      self.position = position
-##          self.title = title
-##      self.action = action
-##
-##      def highlighted(self):
-##      pass
-##
+class Button:
+    """
+    Defines a button for the main outermenu.
+    """
+    def __init__(self, position, text, action, screen):
+        self.position = position
+        self.title = text
+        self.action = action
+        self.offset = 15
+        
+        font = pygame.font.Font('resources/alphbeta.ttf', 30)
+        buttonText = font.render(text, False, color['white'])
+        buttonRect = buttonText.get_rect()
+        buttonRect.center = position
 
-def menu():
+        buttonDimensions = (buttonRect.left - self.offset, buttonRect.top - self.offset, buttonRect.width + self.offset * 2, buttonRect.height + self.offset * 2)
+        pygame.draw.rect(screen, color['red'], buttonDimensions)
+
+        screen.blit(buttonText, buttonRect)
+
+    def highlighted(self):
+        self.color = color['red']
+
+
+def outermenu():
     resolution = [640,480]
     msg = "This is BattleShip!"
     buttons = ["Single Player Game", "Network Game", "Quit"]
@@ -92,7 +103,7 @@ def menu():
         selection = easygui.buttonbox(msg, title, buttons, picture)
         if selection == "Quit":
             easygui.msgbox("Quitter!")
-            break # leave loop
+            sys.exit(0)
         elif selection == "Single Player Game":
             msg = "Single Player Game Selected." #load board and AI
             break
@@ -101,19 +112,20 @@ def menu():
             break
             ##load board and netcoding 
     return 
- 
-if __name__ == '__main__':
-    menu()
+
+
+def menu(screen):
+    title(screen)
+    singleplayer = Button((100,20),"Play",1,screen)
+    # singleplayer.
 
 def main(argv):
 	screen = init()
-
 	gamemode = 0
 
 	while 1:
 		if gamemode == 0:
-			title(screen)
-			menu()
+			menu(screen)
 		elif gamemode == 1:
 			game(screen)
 
@@ -133,4 +145,3 @@ def main(argv):
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
-
