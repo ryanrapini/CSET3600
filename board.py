@@ -27,4 +27,7 @@ class board():
 				return 'hit'
 		else:
 			return 'Pick another Space'
+		
+	def returnboard(self):
+		return self.gameboard
 				

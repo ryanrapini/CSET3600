@@ -1,15 +1,20 @@
-import sys, pygame, os, pygame.mixer
-import easygui
+import sys, pygame, os, pygame.mixer, random
 
 from pygame.locals import *
+from board import *
+from ships import *
 
-
-pygame.mixer.pre_init(44100, -16, 2, 2048) # setup mixer
-
-#hit = pygame.mixer.Sound(os.path.join('resoureces/hit.wav'))  #load sound
-#miss = pygame.mixer.Sound(os.path.join('resoureces/miss.wav'))  #load sound
-#lasthit = pygame.mixer.Sound(os.path.join('resources/lasthit.wav'))  #load sound
-
+pygame.mixer.pre_init(44100, -16, 2, 2048)  # setup mixer
+BOXSIZE = 25 
+GAPSIZE = 5 
+BOARDWIDTH = 10 
+BOARDHEIGHT = 10 
+WINDOWWIDTH = 800 
+WINDOWHEIGHT = 600 
+XMARGIN = int((WINDOWWIDTH - (BOARDWIDTH * (BOXSIZE + GAPSIZE))) / 6)
+XMARGIN2 = int((WINDOWWIDTH - (BOARDWIDTH * (BOXSIZE + GAPSIZE))) / 1.15)
+YMARGIN = int((WINDOWHEIGHT - (BOARDHEIGHT * (BOXSIZE + GAPSIZE))) / 2)
+HIGHLIGHTCOLOR = (  0,   0, 255)
 
 def init():
     pygame.init()
@@ -24,37 +29,38 @@ def init():
     'black' : (0, 0, 0),
     'white' : (255, 255, 255),
     'blue' : (0, 0, 255),
-    'red' : (0, 255, 0)
+    'red' : (255, 0, 0)
     }
 
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Battleship')
-
-    hit = pygame.mixer.Sound(os.path.join('resources/hit.wav')) #load hit sound
-    miss = pygame.mixer.Sound(os.path.join('resources/miss.wav')) #load miss sound
-    lasthit = pygame.mixer.Sound(os.path.join('resources/lasthit.wav')) #load lasthit sound
+    
     return screen
 
 def title(screen):
     # moved text up here for easy access.
     title = 'Battleship'
     subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
+    menu1 = 'Press F1 for single player game'
+    menu2 = 'Press F2 for network game'
+    menu3 = 'Press F3 to quit'
 
     # set font
     mainFont = pygame.font.Font('resources/alphbeta.ttf', 100)
     subFont = pygame.font.Font('resources/alphbeta.ttf', 30)
+    menuFont = pygame.font.Font('resources/Vera.ttf', 50)
 
     # set background
     background = 'resources/battleship.jpg'
     background_surface = pygame.image.load(background)
-    screen.blit(background_surface, (0,0))
+    screen.blit(background_surface, (0, 0))
 
     # draw title background
-    titleSurface = pygame.Surface((800,130))
+    titleSurface = pygame.Surface((800, 130))
     # make background transparent and black
     titleSurface.fill(color['black'])
     titleSurface.set_alpha(200)
-    screen.blit(titleSurface, (0,0))
+    screen.blit(titleSurface, (0, 0))
 
     # draw title text, centered
     titleText = mainFont.render(title, False, color['white'])
@@ -68,80 +74,159 @@ def title(screen):
     titleRect.centerx = 400
     titleRect.top = 90
     screen.blit(subtitleText, titleRect)
+    
+     # draw menu1 text
+    menu1color = pygame.Color(255,0,0,0)
+    menutitleText = menuFont.render(menu1, False, menu1color)
+    titleRect = menutitleText.get_rect()
+    titleRect.centerx = 400
+    titleRect.top = 225
+    screen.blit(menutitleText, titleRect)
+    
+    # draw menu2 text
+    menu2color = pygame.Color(255,0,0,0)
+    menu2titleText = menuFont.render(menu2, False, menu2color)
+    titleRect = menu2titleText.get_rect()
+    titleRect.centerx = 400
+    titleRect.top = 350
+    screen.blit(menu2titleText, titleRect)
+    
+     # draw menu3 text
+    menu3color = pygame.Color(255,0,0,0)
+    menu3titleText = menuFont.render(menu3, False, menu3color)
+    titleRect = menu3titleText.get_rect()
+    titleRect.centerx = 400
+    titleRect.top = 475
+    screen.blit(menu3titleText, titleRect)
+    
+def single (screen):
+    menu = 'Press F1 for new single Game, F2 for network game, F3 to quit game, F4 to return to menu'
+    # set font
+    mainFont = pygame.font.Font('resources/Vera.ttf', 16)
 
-class Button:
-    """
-    Defines a button for the main outermenu.
-    """
-    def __init__(self, position, text, action, screen):
-        self.position = position
-        self.title = text
-        self.action = action
-        self.offset = 15
-        
-        font = pygame.font.Font('resources/alphbeta.ttf', 30)
-        buttonText = font.render(text, False, color['white'])
-        buttonRect = buttonText.get_rect()
-        buttonRect.center = position
+    # draw title background
+    gameSurface = pygame.Surface((800, 20))
+    gameSurface.set_alpha(200)
+    screen.fill(color['white'])
+    screen.blit(gameSurface, (0, 0))
 
-        buttonDimensions = (buttonRect.left - self.offset, buttonRect.top - self.offset, buttonRect.width + self.offset * 2, buttonRect.height + self.offset * 2)
-        pygame.draw.rect(screen, color['red'], buttonDimensions)
+    # draw title text, centered
+    gameText = mainFont.render(menu, False, color['white'])
+    gameRect = gameText.get_rect()
+    gameRect.centerx = 400
+    screen.blit(gameText, gameRect)
+    
+    myfont = pygame.font.SysFont('resources/alphbeta.ttf', 25)
+    label = myfont.render("Attack Board", 1, (255,0,0))
+    screen.blit(label, (XMARGIN+90, 100))
+    label2 = myfont.render("Player Board", 1, (255,0,0))
+    screen.blit(label2, (XMARGIN2+90, 100))
+    
+    
+    
+def multi (screen):
+    menu = 'Press F1 for new single Game, F2 for network game, F3 to quit game, F4 to return to menu'
+    # set font
+    mainFont = pygame.font.Font('resources/Vera.ttf', 16)
 
-        screen.blit(buttonText, buttonRect)
+    # draw title background
+    gameSurface = pygame.Surface((800, 40))
+    gameSurface.set_alpha(200)
+    screen.fill(color['black'])
+    screen.blit(gameSurface, (0, 0))
 
-    def highlighted(self):
-        self.color = color['red']
+    # draw title text, centered
+    gameText = mainFont.render(menu, False, color['white'])
+    gameRect = gameText.get_rect()
+    gameRect.centerx = 400
+    screen.blit(gameText, gameRect)
 
-
-def outermenu():
-    resolution = [640,480]
-    msg = "This is BattleShip!"
-    buttons = ["Single Player Game", "Network Game", "Quit"]
-    picture = None # gif file
-    while True: #endless loop
-        title = "Welcome To BattleShip! Developed by Team Lazer Explosion!"
-        selection = easygui.buttonbox(msg, title, buttons, picture)
-        if selection == "Quit":
-            easygui.msgbox("Quitter!")
-            sys.exit(0)
-        elif selection == "Single Player Game":
-            msg = "Single Player Game Selected." #load board and AI
-            break
-        elif selection == "Network Game":
-            msg = "Multiplayer Game Selected."
-            break
-            ##load board and netcoding 
-    return 
-
-
-def menu(screen):
-    title(screen)
-    singleplayer = Button((100,20),"Play",1,screen)
-    # singleplayer.
-
+def drawBoard(board, screen, xm):
+    BLANKCOLOR = color['black']
+    HITCOLOR = color['red']
+    MISSCOLOR = color['blue']
+    for x in range(BOARDWIDTH):
+        for y in range(BOARDHEIGHT):
+            left, top = leftTopCoordsOfBox(x, y, xm)
+            if (board.returnpiece(x,y) == 0):
+            	pygame.draw.rect(screen, BLANKCOLOR, (left, top, BOXSIZE, BOXSIZE))
+            elif (board.returnpiece(x,y) == 7):
+                pygame.draw.rect(screen, MISSCOLOR, (left, top, BOXSIZE, BOXSIZE))
+            elif (board.returnpiece(x,y) == 8):
+            	pygame.draw.rect(screen, HITCOLOR, (left, top, BOXSIZE, BOXSIZE))
+            
+def leftTopCoordsOfBox(boxx, boxy, xm):
+    # Convert board coordinates to pixel coordinates
+    left = boxx * (BOXSIZE + GAPSIZE) + xm
+    top = boxy * (BOXSIZE + GAPSIZE) + YMARGIN
+    return (left, top)
+    
+def getBoxAtPixel(x, y, xm):
+    for boxx in range(BOARDWIDTH):
+        for boxy in range(BOARDHEIGHT):
+            left, top = leftTopCoordsOfBox(boxx, boxy, xm)
+            boxRect = pygame.Rect(left, top, BOXSIZE, BOXSIZE)
+            if boxRect.collidepoint(x, y):
+                return (boxx, boxy)
+    return (None, None)
+   
 def main(argv):
-	screen = init()
-	gamemode = 0
-
-	while 1:
-		if gamemode == 0:
-			menu(screen)
-		elif gamemode == 1:
-			game(screen)
-
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT: 
-				pygame.quit()
-				sys.exit()
-			elif event.type == MOUSEMOTION:
-				mousex, mousey = event.pos
-			elif event.type == MOUSEBUTTONDOWN:
-				mousex, mousey = event.pos
-			elif event.type == MOUSEBUTTONUP:
-				mousex, mousey = event.pos
-
-		pygame.display.update()
-		fpsClock.tick(30)
+    screen = init()
+    title(screen)
+    gametype = 0
+    
+    while 1:
+        mouseClicked = False
+        for event in pygame.event.get():
+            pressed = pygame.key.get_pressed()
+            if event.type == pygame.QUIT: 
+                pygame.quit()
+                sys.exit()
+            elif pressed[pygame.K_F1]:
+                single(screen)
+                gametype = 1
+                gamestarted = 0
+            elif pressed[pygame.K_F2]:
+                multi(screen)
+                gametype = 2
+                gamestarted = 0
+            elif pressed[pygame.K_F3]:
+                pygame.quit()
+                sys.exit()
+            elif pressed[pygame.K_F4]:
+                title(screen)
+                gametype = 0
+            elif event.type == MOUSEMOTION:
+                mousex, mousey = event.pos
+            elif event.type == MOUSEBUTTONUP:
+                mousex, mousey = event.pos
+                mouseClicked = True
+        if (gametype == 1):
+            if (gamestarted == 0):
+                playerboard = board()
+                playerattackboard = board()
+                playerships = ships()
+                cpuboard = board()
+                cpuattackboard = board()
+                cpuships = ships()
+                gamestarted = 1
+            else:
+                drawBoard(playerattackboard, screen, XMARGIN)
+                drawBoard(playerboard, screen, XMARGIN2)
+                boxx, boxy = getBoxAtPixel(mousex, mousey, XMARGIN)
+                boxx2, boxy2 = getBoxAtPixel(mousex, mousey, XMARGIN2)
+                if (boxx != None and boxy != None):
+                    if mouseClicked:
+                        print(boxx, boxy)
+                        test = playerattackboard.returnpiece(boxx,boxy)
+                        print(test)
+                elif (boxx2 != None and boxy2 != None) and mouseClicked:
+                    if mouseClicked:
+                        print(boxx2, boxy2)
+        # redraw screen       
+        pygame.display.update()
+        fpsClock.tick(60)
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
+
