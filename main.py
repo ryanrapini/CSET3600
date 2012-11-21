@@ -88,7 +88,7 @@ class Button:
         self.bgcolor = color['red']
 
 
-def title(screen, mousex = 0, mousey = 0):
+def title(screen, mousex = 0, mousey = 0, mouseClicked = False):
     # moved text up here for easy access.
     title = 'Battleship'
     subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
@@ -144,7 +144,18 @@ def title(screen, mousex = 0, mousey = 0):
     if (quitButton.getBounds().collidepoint(mousex, mousey)):
         quitButton.highlighted(screen)
     quitButton.draw(screen)
+    
+    gamemode = 0
+    
+    if (mouseClicked):
+        if (singleplayerButton.getBounds().collidepoint(mousex, mousey)):
+            gamemode = 1
+        elif (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
+            gamemode = 2
+        elif (quitButton.getBounds().collidepoint(mousex, mousey)):
+            gamemode = 3
 
+    return gamemode
 
     
 def single(screen):
@@ -235,7 +246,8 @@ def whatbox(x, y, xm):
 def main(argv):
     screen = init()
     title(screen)
-    gametype = 0
+    gamemode = 0
+    gamestarted = 0
     
     while 1:
         mouseClicked = False
@@ -246,26 +258,28 @@ def main(argv):
                 sys.exit()
             elif pressed[pygame.K_F1]:
                 single(screen)
-                gametype = 1
-                gamestarted = 0
+                gamemode = 1
             elif pressed[pygame.K_F2]:
                 multi(screen)
-                gametype = 2
-                gamestarted = 0
+                gamemode = 2
             elif pressed[pygame.K_F3]:
-                pygame.quit()
-                sys.exit()
+                gamemode = 3
             elif pressed[pygame.K_F4]:
                 title(screen)
-                gametype = 0
             elif event.type == MOUSEMOTION:
                 mousex, mousey = event.pos
             elif event.type == MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 mouseClicked = True
-        if (gametype == 0):
-            title(screen, mousex, mousey)
-        if (gametype == 1):
+
+        if (gamemode == 0):
+            gamemode = title(screen, mousex, mousey, mouseClicked)
+            # for each gamemode loop, pass continue so that if the gamemode is dropped, the entire loop is reset
+            # instead of just progressing to the next line
+            if (gamemode != 0):
+                continue
+
+        if (gamemode == 1):
             if (gamestarted == 0):
                 playerboard = board()
                 playerattackboard = board()
@@ -288,6 +302,14 @@ def main(argv):
                         print(boxx2, boxy2)
                         test = playerboard.returnpiece(boxx2,boxy2)
                         print(test)
+
+        if (gamemode == 2):
+            pass
+
+        if (gamemode == 3):
+            print('Quitting.')
+            pygame.quit()
+            sys.exit(0)
         # redraw screen       
         pygame.display.update()
         fpsClock.tick(60)
