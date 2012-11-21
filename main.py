@@ -27,7 +27,19 @@ piecevalue = 1
 def loadSound():
     pygame.mixer.pre_init(44100, -16, 2, 2048)  # setup mixer
 
-    
+
+def seticon():
+    # Call this between pygame init and drawing the first window in order to set the icon
+    icon=pygame.Surface((32,32))
+    # using magic pink as transparent
+    icon.set_colorkey((255,0,255))
+    rawicon=pygame.image.load('resources/icon.bmp')
+    for i in range(0,32):
+        for j in range(0,32):
+            icon.set_at((i,j), rawicon.get_at((i,j)))
+    pygame.display.set_icon(icon)
+
+
 def init():
     # Initilize Pygame. THIS MUST HAPPEN BEFORE ANYTHING ELSE CAN TOUCH THE PYGAME UTILS.
     try:
@@ -47,6 +59,7 @@ def init():
     else:
         print("Sound loaded sucessfully.")
 
+    seticon()
     global fpsClock
     fpsClock = pygame.time.Clock()
 
@@ -246,6 +259,7 @@ def whatbox(x, y, xm):
 
 def main(argv):
     screen = init()
+    print ("Drawing main menu.")
     title(screen)
     gamemode = 0
     gamestarted = 0
@@ -290,6 +304,7 @@ def main(argv):
         # If we're in gamemode 1, show the game screen
         if (gamemode == 1):
             if (gamestarted == 0):
+                print ("Starting a new game")
                 single(screen)
                 playerboard = board()
                 playerattackboard = board()
@@ -329,7 +344,7 @@ def main(argv):
 
             pygame.display.update()
             print('Quitting :[')
-            
+
             pygame.time.wait(500)
             pygame.quit()
             sys.exit(0)
