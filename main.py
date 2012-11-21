@@ -71,7 +71,7 @@ class Button:
         self.bgcolor = color['blue']
 
         self.font = pygame.font.Font('resources/Vera.ttf', 26)
-        self.buttonText = self.font.render(text, False, color['white'])
+        self.buttonText = self.font.render(text, True, color['white'])
         self.buttonRect = self.buttonText.get_rect()
         self.buttonRect.topleft = position
 
@@ -101,7 +101,6 @@ def title(screen):
     # set font
     mainFont = pygame.font.Font('resources/alphbeta.ttf', 100)
     subFont = pygame.font.Font('resources/alphbeta.ttf', 30)
-    
 
     # set background
     background = 'resources/battleship.jpg'
