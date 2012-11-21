@@ -160,6 +160,7 @@ def title(screen, mousex = 0, mousey = 0, mouseClicked = False):
     
 def single(screen):
     menu = 'Press F1 for new single Game, F2 for network game, F3 to quit game, F4 to return to menu'
+
     # set font
     mainFont = pygame.font.Font('resources/Vera.ttf', 16)
 
@@ -253,34 +254,43 @@ def main(argv):
         mouseClicked = False
         for event in pygame.event.get():
             pressed = pygame.key.get_pressed()
+            # If the user clicks the x at the top of the window
             if event.type == pygame.QUIT: 
-                pygame.quit()
-                sys.exit()
+                gamemode = 3
+
+            # If the user presses F1
             elif pressed[pygame.K_F1]:
-                single(screen)
                 gamemode = 1
+
+            # If the user presses F2
             elif pressed[pygame.K_F2]:
-                multi(screen)
                 gamemode = 2
+
+            # If the user presses F3
             elif pressed[pygame.K_F3]:
                 gamemode = 3
+
+            # If the user presses F4
             elif pressed[pygame.K_F4]:
-                title(screen)
+                gamemode = 0
+
+            # If the mouse is moved, record the current coordinates
             elif event.type == MOUSEMOTION:
                 mousex, mousey = event.pos
+
+            # If the mouse is clicked, say so and record the current coordinates
             elif event.type == MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 mouseClicked = True
 
+        # If we're in gamemode 0, show the titlescreen
         if (gamemode == 0):
             gamemode = title(screen, mousex, mousey, mouseClicked)
-            # for each gamemode loop, pass continue so that if the gamemode is dropped, the entire loop is reset
-            # instead of just progressing to the next line
-            if (gamemode != 0):
-                continue
 
+        # If we're in gamemode 1, show the game screen
         if (gamemode == 1):
             if (gamestarted == 0):
+                single(screen)
                 playerboard = board()
                 playerattackboard = board()
                 cpuboard = board()
@@ -303,11 +313,24 @@ def main(argv):
                         test = playerboard.returnpiece(boxx2,boxy2)
                         print(test)
 
+        # If we're in gamemode 2, show the multiplayer screen
         if (gamemode == 2):
+            multi(screen)
             pass
 
+        # If we're in gamemode 3, we're quitting
         if (gamemode == 3):
-            print('Quitting.')
+            screen.fill(color['black'])
+            font = pygame.font.Font('resources/alphbeta.ttf', 70)
+            thanks = font.render("Thanks for playing!", False, color['white'])
+            thanksRect = thanks.get_rect()
+            thanksRect.center = (400, 300)
+            screen.blit(thanks, thanksRect)
+
+            pygame.display.update()
+            print('Quitting :[')
+            
+            pygame.time.wait(500)
             pygame.quit()
             sys.exit(0)
         # redraw screen       
