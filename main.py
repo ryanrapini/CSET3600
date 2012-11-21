@@ -2,7 +2,6 @@ import sys, pygame, os, pygame.mixer, random
 
 from pygame.locals import *
 from board import *
-from ships import *
 from AI import *
 
 pygame.mixer.pre_init(44100, -16, 2, 2048)  # setup mixer
@@ -16,6 +15,8 @@ XMARGIN = int((WINDOWWIDTH - (BOARDWIDTH * (BOXSIZE + GAPSIZE))) / 6)
 XMARGIN2 = int((WINDOWWIDTH - (BOARDWIDTH * (BOXSIZE + GAPSIZE))) / 1.15)
 YMARGIN = int((WINDOWHEIGHT - (BOARDHEIGHT * (BOXSIZE + GAPSIZE))) / 2)
 HIGHLIGHTCOLOR = (  0,   0, 255)
+shiparray = [6,5,4,3,2]
+piecevalue = 1
 
 def init():
     pygame.init()
@@ -30,7 +31,8 @@ def init():
     'black' : (0, 0, 0),
     'white' : (255, 255, 255),
     'blue' : (0, 0, 255),
-    'red' : (255, 0, 0)
+    'red' : (255, 0, 0),
+    'green' : (0, 255, 0)
     }
 
     screen = pygame.display.set_mode(size)
@@ -159,19 +161,31 @@ def multi(screen):
     gameRect.centerx = 400
     screen.blit(gameText, gameRect)
 
-def drawBoard(board, screen, xm):
+def drawboards(attackboard, playerboard, screen, xm1, xm2):
     BLANKCOLOR = color['black']
     HITCOLOR = color['red']
     MISSCOLOR = color['blue']
+    SHIPCOLOR = color['green']
     for x in range(BOARDWIDTH):
         for y in range(BOARDHEIGHT):
-            left, top = whereisbox(x, y, xm)
-            if (board.returnpiece(x,y) == 0):
-            	pygame.draw.rect(screen, BLANKCOLOR, (left, top, BOXSIZE, BOXSIZE))
-            elif (board.returnpiece(x,y) == 7):
-                pygame.draw.rect(screen, MISSCOLOR, (left, top, BOXSIZE, BOXSIZE))
-            elif (board.returnpiece(x,y) == 8):
-            	pygame.draw.rect(screen, HITCOLOR, (left, top, BOXSIZE, BOXSIZE))
+            left1, top1 = whereisbox(x, y, xm1)
+            left2, top2 = whereisbox(x, y, xm2)
+            if (attackboard.returnpiece(x,y) == 0):
+            	pygame.draw.rect(screen, BLANKCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
+            elif (attackboard.returnpiece(x,y) == 1):
+                pygame.draw.rect(screen, MISSCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
+            elif (attackboard.returnpiece(x,y) == 7):
+                pygame.draw.rect(screen, MISSCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
+            elif (attackboard.returnpiece(x,y) == 8):
+            	pygame.draw.rect(screen, HITCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
+            if (playerboard.returnpiece(x,y) == 0):
+                pygame.draw.rect(screen, BLANKCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+            elif (playerboard.returnpiece(x,y) == 1):
+                pygame.draw.rect(screen, MISSCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+            elif (playerboard.returnpiece(x,y) == 7):
+                pygame.draw.rect(screen, MISSCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+            elif (playerboard.returnpiece(x,y) == 8):
+                pygame.draw.rect(screen, HITCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
             
 def whereisbox(boxx, boxy, xm):
     # Convert board coordinates to pixel coordinates
@@ -223,14 +237,13 @@ def main(argv):
             if (gamestarted == 0):
                 playerboard = board()
                 playerattackboard = board()
-                playerships = ships()
                 cpuboard = board()
                 cpuattackboard = board()
-                cpuships = ships()
+                comp = AI()
+                comp.placeships(shiparray, piecevalue, playerboard)
                 gamestarted = 1
             else:
-                drawBoard(playerattackboard, screen, XMARGIN)
-                drawBoard(playerboard, screen, XMARGIN2)
+                drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
                 boxx, boxy = whatbox(mousex, mousey, XMARGIN)
                 boxx2, boxy2 = whatbox(mousex, mousey, XMARGIN2)
                 if (boxx != None and boxy != None):
@@ -241,6 +254,8 @@ def main(argv):
                 elif (boxx2 != None and boxy2 != None) and mouseClicked:
                     if mouseClicked:
                         print(boxx2, boxy2)
+                        test = playerboard.returnpiece(boxx2,boxy2)
+                        print(test)
         # redraw screen       
         pygame.display.update()
         fpsClock.tick(60)
