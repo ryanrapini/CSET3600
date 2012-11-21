@@ -1,10 +1,16 @@
 import sys, pygame, os, pygame.mixer, random
-
 from pygame.locals import *
 from board import *
 from AI import *
 
-pygame.mixer.pre_init(44100, -16, 2, 2048)  # setup mixer
+color = {
+'black' : (0, 0, 0),
+'white' : (255, 255, 255),
+'blue' : (0, 0, 255),
+'red' : (255, 0, 0),
+'green' : (0, 255, 0)
+}
+
 BOXSIZE = 25 
 GAPSIZE = 5 
 BOARDWIDTH = 10 
@@ -14,31 +20,44 @@ WINDOWHEIGHT = 600
 XMARGIN = int((WINDOWWIDTH - (BOARDWIDTH * (BOXSIZE + GAPSIZE))) / 6)
 XMARGIN2 = int((WINDOWWIDTH - (BOARDWIDTH * (BOXSIZE + GAPSIZE))) / 1.15)
 YMARGIN = int((WINDOWHEIGHT - (BOARDHEIGHT * (BOXSIZE + GAPSIZE))) / 2)
-HIGHLIGHTCOLOR = (  0,   0, 255)
+HIGHLIGHTCOLOR = color['blue']
 shiparray = [6,5,4,3,2]
 piecevalue = 1
 
+def loadSound():
+    pygame.mixer.pre_init(44100, -16, 2, 2048)  # setup mixer
+
+    
 def init():
-    pygame.init()
+    # Initilize Pygame. THIS MUST HAPPEN BEFORE ANYTHING ELSE CAN TOUCH THE PYGAME UTILS.
+    try:
+        pygame.init()
+    except Exception as ex:
+        print("Failed to load pygame. Exception is:\n{0}".format(ex))
+        # If pygame doesn't load, we might as well just give up.
+        sys.exit(1)
+    else:
+        print("Pygame initilized sucessfully.")
+
+    # Load sound
+    try:
+        loadSound()
+    except Exception as ex:
+        print("Failed to load sound. Exception is:\n{0}".format(ex))
+    else:
+        print("Sound loaded sucessfully.")
+
     global fpsClock
     fpsClock = pygame.time.Clock()
 
     size = width, height = 800, 600
     speed = [2, 2]
 
-    global color
-    color = {
-    'black' : (0, 0, 0),
-    'white' : (255, 255, 255),
-    'blue' : (0, 0, 255),
-    'red' : (255, 0, 0),
-    'green' : (0, 255, 0)
-    }
-
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Battleship')
     
     return screen
+
 
 def title(screen):
     # moved text up here for easy access.
@@ -143,7 +162,6 @@ def single(screen):
     screen.blit(label2, (XMARGIN2+90, 100))
     
     
-    
 def multi(screen):
     menu = 'Press F1 for new single Game, F2 for network game, F3 to quit game, F4 to return to menu'
     # set font
@@ -160,6 +178,7 @@ def multi(screen):
     gameRect = gameText.get_rect()
     gameRect.centerx = 400
     screen.blit(gameText, gameRect)
+
 
 def drawboards(attackboard, playerboard, screen, xm1, xm2):
     BLANKCOLOR = color['black']
@@ -192,7 +211,8 @@ def whereisbox(boxx, boxy, xm):
     left = boxx * (BOXSIZE + GAPSIZE) + xm
     top = boxy * (BOXSIZE + GAPSIZE) + YMARGIN
     return (left, top)
-    
+
+   
 def whatbox(x, y, xm):
     for boxx in range(BOARDWIDTH):
         for boxy in range(BOARDHEIGHT):
@@ -201,7 +221,8 @@ def whatbox(x, y, xm):
             if boxRect.collidepoint(x, y):
                 return (boxx, boxy)
     return (None, None)
-   
+
+
 def main(argv):
     screen = init()
     title(screen)
