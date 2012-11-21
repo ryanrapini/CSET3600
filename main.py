@@ -59,19 +59,49 @@ def init():
     return screen
 
 
+class Button:
+    """
+    Defines a button for the main outermenu.
+    """
+    def __init__(self, position, text, action):
+        self.position = position
+        self.title = text
+        self.action = action
+        self.offset = 15
+        self.bgcolor = color['blue']
+
+        self.font = pygame.font.Font('resources/Vera.ttf', 26)
+        self.buttonText = self.font.render(text, False, color['white'])
+        self.buttonRect = self.buttonText.get_rect()
+        self.buttonRect.topleft = position
+
+        self.buttonDimensions = (self.buttonRect.left - self.offset, self.buttonRect.top - self.offset, self.buttonRect.width + self.offset * 2, self.buttonRect.height + self.offset * 2)
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.bgcolor, self.buttonDimensions)
+        screen.blit(self.buttonText, self.buttonRect)
+
+    def getBounds(self):
+        return self.buttonRect
+
+    def highlighted(self, screen):
+        self.bgcolor = color['red']
+
+
 def title(screen):
     # moved text up here for easy access.
     title = 'Battleship'
     subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
-    press = 'Press:'
-    menu1 = 'F1 for single player game'
-    menu2 = 'F2 for network game'
-    menu3 = 'F3 to quit'
+
+    # Button positioning variables, tweak to adjust
+    leftoffset = 65
+    topoffset = 520
+    buttonspacing = 50
 
     # set font
     mainFont = pygame.font.Font('resources/alphbeta.ttf', 100)
     subFont = pygame.font.Font('resources/alphbeta.ttf', 30)
-    menuFont = pygame.font.Font('resources/Vera.ttf', 26)
+    
 
     # set background
     background = 'resources/battleship.jpg'
@@ -97,46 +127,16 @@ def title(screen):
     titleRect.centerx = 400
     titleRect.top = 90
     screen.blit(subtitleText, titleRect)
+
+    singleplayerButton = Button((leftoffset, topoffset),"Play Singleplayer",1)
+    singleplayerButton.draw(screen)
+
+    multiplayerButton = Button((singleplayerButton.getBounds().right + buttonspacing, topoffset),"Play Multiplayer",2)
+    multiplayerButton.draw(screen)
     
-    # draw menu surface
-    # draw title background
-    menuSurface = pygame.Surface((400, 275))
-    # make background transparent and black
-    menuSurface.fill(color['black'])
-    menuSurface.set_alpha(200)
-    screen.blit(menuSurface, (200, 225))
-    
-    # draw press text
-    menu0color = pygame.Color(255,0,0,0)
-    menu0titleText = menuFont.render(press, False, menu0color)
-    menuRect = menu0titleText.get_rect()
-    menuRect.centerx = 400
-    menuRect.top = 240
-    screen.blit(menu0titleText, menuRect)
-    
-     # draw menu1 text
-    menu1color = pygame.Color(255,0,0,0)
-    menutitleText = menuFont.render(menu1, False, menu1color)
-    menuRect = menutitleText.get_rect()
-    menuRect.centerx = 400
-    menuRect.top = 300
-    screen.blit(menutitleText, menuRect)
-    
-    # draw menu2 text
-    menu2color = pygame.Color(255,0,0,0)
-    menu2titleText = menuFont.render(menu2, False, menu2color)
-    menuRect = menu2titleText.get_rect()
-    menuRect.centerx = 400
-    menuRect.top = 375
-    screen.blit(menu2titleText, menuRect)
-    
-     # draw menu3 text
-    menu3color = pygame.Color(255,0,0,0)
-    menu3titleText = menuFont.render(menu3, False, menu3color)
-    menuRect = menu3titleText.get_rect()
-    menuRect.centerx = 400
-    menuRect.top = 450
-    screen.blit(menu3titleText, menuRect)
+    quitButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset),"Quit Game",3)
+    quitButton.draw(screen)
+
     
 def single(screen):
     menu = 'Press F1 for new single Game, F2 for network game, F3 to quit game, F4 to return to menu'
