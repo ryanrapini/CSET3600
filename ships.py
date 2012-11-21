@@ -19,3 +19,6 @@ class ships():
 			
 	def returnpatrolboat(self):
 				return self.pb
+			
+	def returntotalships(self):
+				return 5

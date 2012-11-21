@@ -3,6 +3,7 @@ import sys, pygame, os, pygame.mixer, random
 from pygame.locals import *
 from board import *
 from ships import *
+from AI import *
 
 pygame.mixer.pre_init(44100, -16, 2, 2048)  # setup mixer
 BOXSIZE = 25 
@@ -41,14 +42,15 @@ def title(screen):
     # moved text up here for easy access.
     title = 'Battleship'
     subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
-    menu1 = 'Press F1 for single player game'
-    menu2 = 'Press F2 for network game'
-    menu3 = 'Press F3 to quit'
+    press = 'Press:'
+    menu1 = 'F1 for single player game'
+    menu2 = 'F2 for network game'
+    menu3 = 'F3 to quit'
 
     # set font
     mainFont = pygame.font.Font('resources/alphbeta.ttf', 100)
     subFont = pygame.font.Font('resources/alphbeta.ttf', 30)
-    menuFont = pygame.font.Font('resources/Vera.ttf', 50)
+    menuFont = pygame.font.Font('resources/Vera.ttf', 26)
 
     # set background
     background = 'resources/battleship.jpg'
@@ -75,31 +77,47 @@ def title(screen):
     titleRect.top = 90
     screen.blit(subtitleText, titleRect)
     
+    # draw menu surface
+    # draw title background
+    menuSurface = pygame.Surface((400, 275))
+    # make background transparent and black
+    menuSurface.fill(color['black'])
+    menuSurface.set_alpha(200)
+    screen.blit(menuSurface, (200, 225))
+    
+    # draw press text
+    menu0color = pygame.Color(255,0,0,0)
+    menu0titleText = menuFont.render(press, False, menu0color)
+    menuRect = menu0titleText.get_rect()
+    menuRect.centerx = 400
+    menuRect.top = 240
+    screen.blit(menu0titleText, menuRect)
+    
      # draw menu1 text
     menu1color = pygame.Color(255,0,0,0)
     menutitleText = menuFont.render(menu1, False, menu1color)
-    titleRect = menutitleText.get_rect()
-    titleRect.centerx = 400
-    titleRect.top = 225
-    screen.blit(menutitleText, titleRect)
+    menuRect = menutitleText.get_rect()
+    menuRect.centerx = 400
+    menuRect.top = 300
+    screen.blit(menutitleText, menuRect)
     
     # draw menu2 text
     menu2color = pygame.Color(255,0,0,0)
     menu2titleText = menuFont.render(menu2, False, menu2color)
-    titleRect = menu2titleText.get_rect()
-    titleRect.centerx = 400
-    titleRect.top = 350
-    screen.blit(menu2titleText, titleRect)
+    menuRect = menu2titleText.get_rect()
+    menuRect.centerx = 400
+    menuRect.top = 375
+    screen.blit(menu2titleText, menuRect)
     
      # draw menu3 text
     menu3color = pygame.Color(255,0,0,0)
     menu3titleText = menuFont.render(menu3, False, menu3color)
-    titleRect = menu3titleText.get_rect()
-    titleRect.centerx = 400
-    titleRect.top = 475
-    screen.blit(menu3titleText, titleRect)
+    menuRect = menu3titleText.get_rect()
+    menuRect.centerx = 400
+    menuRect.top = 450
+    screen.blit(menu3titleText, menuRect)
     
-def single (screen):
+def single(screen):
     menu = 'Press F1 for new single Game, F2 for network game, F3 to quit game, F4 to return to menu'
     # set font
     mainFont = pygame.font.Font('resources/Vera.ttf', 16)
@@ -124,15 +142,15 @@ def single (screen):
     
     
     
-def multi (screen):
+def multi(screen):
     menu = 'Press F1 for new single Game, F2 for network game, F3 to quit game, F4 to return to menu'
     # set font
     mainFont = pygame.font.Font('resources/Vera.ttf', 16)
 
     # draw title background
-    gameSurface = pygame.Surface((800, 40))
+    gameSurface = pygame.Surface((800, 20))
     gameSurface.set_alpha(200)
-    screen.fill(color['black'])
+    screen.fill(color['white'])
     screen.blit(gameSurface, (0, 0))
 
     # draw title text, centered
@@ -147,7 +165,7 @@ def drawBoard(board, screen, xm):
     MISSCOLOR = color['blue']
     for x in range(BOARDWIDTH):
         for y in range(BOARDHEIGHT):
-            left, top = leftTopCoordsOfBox(x, y, xm)
+            left, top = whereisbox(x, y, xm)
             if (board.returnpiece(x,y) == 0):
             	pygame.draw.rect(screen, BLANKCOLOR, (left, top, BOXSIZE, BOXSIZE))
             elif (board.returnpiece(x,y) == 7):
@@ -155,16 +173,16 @@ def drawBoard(board, screen, xm):
             elif (board.returnpiece(x,y) == 8):
             	pygame.draw.rect(screen, HITCOLOR, (left, top, BOXSIZE, BOXSIZE))
             
-def leftTopCoordsOfBox(boxx, boxy, xm):
+def whereisbox(boxx, boxy, xm):
     # Convert board coordinates to pixel coordinates
     left = boxx * (BOXSIZE + GAPSIZE) + xm
     top = boxy * (BOXSIZE + GAPSIZE) + YMARGIN
     return (left, top)
     
-def getBoxAtPixel(x, y, xm):
+def whatbox(x, y, xm):
     for boxx in range(BOARDWIDTH):
         for boxy in range(BOARDHEIGHT):
-            left, top = leftTopCoordsOfBox(boxx, boxy, xm)
+            left, top = whereisbox(boxx, boxy, xm)
             boxRect = pygame.Rect(left, top, BOXSIZE, BOXSIZE)
             if boxRect.collidepoint(x, y):
                 return (boxx, boxy)
@@ -213,8 +231,8 @@ def main(argv):
             else:
                 drawBoard(playerattackboard, screen, XMARGIN)
                 drawBoard(playerboard, screen, XMARGIN2)
-                boxx, boxy = getBoxAtPixel(mousex, mousey, XMARGIN)
-                boxx2, boxy2 = getBoxAtPixel(mousex, mousey, XMARGIN2)
+                boxx, boxy = whatbox(mousex, mousey, XMARGIN)
+                boxx2, boxy2 = whatbox(mousex, mousey, XMARGIN2)
                 if (boxx != None and boxy != None):
                     if mouseClicked:
                         print(boxx, boxy)
