@@ -63,14 +63,14 @@ class Button:
     """
     Defines a button for the main outermenu.
     """
-    def __init__(self, position, text, action):
+    def __init__(self, position, text, action, fontsize = 22):
         self.position = position
         self.title = text
         self.action = action
         self.offset = 15
         self.bgcolor = color['blue']
 
-        self.font = pygame.font.Font('resources/Vera.ttf', 26)
+        self.font = pygame.font.Font('resources/Vera.ttf', fontsize)
         self.buttonText = self.font.render(text, True, color['white'])
         self.buttonRect = self.buttonText.get_rect()
         self.buttonRect.topleft = position
@@ -82,21 +82,21 @@ class Button:
         screen.blit(self.buttonText, self.buttonRect)
 
     def getBounds(self):
-        return self.buttonRect
+        return pygame.Rect(self.buttonDimensions)
 
     def highlighted(self, screen):
         self.bgcolor = color['red']
 
 
-def title(screen):
+def title(screen, mousex = 0, mousey = 0):
     # moved text up here for easy access.
     title = 'Battleship'
     subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
 
-    # Button positioning variables, tweak to adjust
-    leftoffset = 65
+    # Button positioning variables, tweak to adjust. I'd make them autocenter but I'm lazy
+    leftoffset = 35
     topoffset = 520
-    buttonspacing = 50
+    buttonspacing = 30
 
     # set font
     mainFont = pygame.font.Font('resources/alphbeta.ttf', 100)
@@ -127,14 +127,24 @@ def title(screen):
     titleRect.top = 90
     screen.blit(subtitleText, titleRect)
 
-    singleplayerButton = Button((leftoffset, topoffset),"Play Singleplayer",1)
+    # load a singleplayer button, draw to screen
+    singleplayerButton = Button((leftoffset, topoffset),"Play Singleplayer [F1]",1)
+    if (singleplayerButton.getBounds().collidepoint(mousex, mousey)):
+        singleplayerButton.highlighted(screen)
     singleplayerButton.draw(screen)
 
-    multiplayerButton = Button((singleplayerButton.getBounds().right + buttonspacing, topoffset),"Play Multiplayer",2)
+    # load a multiplayer button, draw to screen
+    multiplayerButton = Button((singleplayerButton.getBounds().right + buttonspacing, topoffset),"Play Multiplayer [F2]",2)
+    if (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
+        multiplayerButton.highlighted(screen)
     multiplayerButton.draw(screen)
     
-    quitButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset),"Quit Game",3)
+    # load a quit button, draw to screen
+    quitButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset),"Quit Game [F3]",3)
+    if (quitButton.getBounds().collidepoint(mousex, mousey)):
+        quitButton.highlighted(screen)
     quitButton.draw(screen)
+
 
     
 def single(screen):
@@ -253,6 +263,8 @@ def main(argv):
             elif event.type == MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 mouseClicked = True
+        if (gametype == 0):
+            title(screen, mousex, mousey)
         if (gametype == 1):
             if (gamestarted == 0):
                 playerboard = board()
