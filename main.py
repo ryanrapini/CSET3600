@@ -390,11 +390,11 @@ def main(argv):
             # If the user presses F1
             elif pressed[pygame.K_F1]:
                 gamemode = 1
-
+                gamestarted = 0
             # If the user presses F2
             elif pressed[pygame.K_F2]:
                 gamemode = 2
-
+                gamestarted = 0
             # If the user presses F3
             elif pressed[pygame.K_F3]:
                 gamemode = 3
@@ -402,6 +402,7 @@ def main(argv):
             # If the user presses F4
             elif pressed[pygame.K_F4]:
                 gamemode = 0
+                gamestarted = 0
 
             # If the mouse is moved, record the current coordinates
             elif event.type == MOUSEMOTION:
