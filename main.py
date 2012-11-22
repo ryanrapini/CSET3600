@@ -1,4 +1,4 @@
-import sys, pygame, os, pygame.mixer, random
+import sys, pygame, os, random, textrect, socket
 from pygame.locals import *
 from board import *
 from AI import *
@@ -6,6 +6,7 @@ from AI import *
 color = {
 'black' : (0, 0, 0),
 'white' : (255, 255, 255),
+'gray' : (100, 100, 100),
 'blue' : (0, 0, 255),
 'red' : (255, 0, 0),
 'green' : (0, 255, 0)
@@ -38,6 +39,12 @@ def seticon():
         for j in range(0,32):
             icon.set_at((i,j), rawicon.get_at((i,j)))
     pygame.display.set_icon(icon)
+
+def getIP():
+    # Create a dummy socket to report local IP address
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(('google.com', 0))
+    return s.getsockname()[0]
 
 
 def init():
@@ -76,10 +83,9 @@ class Button:
     """
     Defines a button for the main outermenu.
     """
-    def __init__(self, position, text, action, fontsize = 22):
+    def __init__(self, position, text, fontsize = 22):
         self.position = position
         self.title = text
-        self.action = action
         self.offset = 15
         self.bgcolor = color['blue']
 
@@ -101,7 +107,7 @@ class Button:
         self.bgcolor = color['red']
 
 
-def title(screen, mousex = 0, mousey = 0, mouseClicked = False):
+def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     # moved text up here for easy access.
     title = 'Battleship'
     subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
@@ -141,19 +147,19 @@ def title(screen, mousex = 0, mousey = 0, mouseClicked = False):
     screen.blit(subtitleText, titleRect)
 
     # load a singleplayer button, draw to screen
-    singleplayerButton = Button((leftoffset, topoffset),"Play Singleplayer [F1]",1)
+    singleplayerButton = Button((leftoffset, topoffset),"Play Singleplayer [F1]")
     if (singleplayerButton.getBounds().collidepoint(mousex, mousey)):
         singleplayerButton.highlighted(screen)
     singleplayerButton.draw(screen)
 
     # load a multiplayer button, draw to screen
-    multiplayerButton = Button((singleplayerButton.getBounds().right + buttonspacing, topoffset),"Play Multiplayer [F2]",2)
+    multiplayerButton = Button((singleplayerButton.getBounds().right + buttonspacing, topoffset),"Play Multiplayer [F2]")
     if (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
         multiplayerButton.highlighted(screen)
     multiplayerButton.draw(screen)
     
     # load a quit button, draw to screen
-    quitButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset),"Quit Game [F3]",3)
+    quitButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset),"Quit Game [F3]")
     if (quitButton.getBounds().collidepoint(mousex, mousey)):
         quitButton.highlighted(screen)
     quitButton.draw(screen)
@@ -194,24 +200,104 @@ def single(screen):
     screen.blit(label, (XMARGIN+90, 100))
     label2 = myfont.render("Player Board", 1, (255,0,0))
     screen.blit(label2, (XMARGIN2+90, 100))
-    
-    
-def multi(screen):
-    menu = 'Press F1 for new single Game, F2 for network game, F3 to quit game, F4 to return to menu'
+
+
+def textbox(screen, position, message):
+    """
+    Prints an onscreen message
+    """
+    mainFont = pygame.font.Font('resources/Vera.ttf', 20)
+    textbox = pygame.Rect(position[0]-10, position[1]-5, 200, 36)
+
+    pygame.draw.rect(screen, color['black'], textbox, 0)
+    pygame.draw.rect(screen, color['white'], textbox, 2)
+
+    if len(message) != 0:
+        screen.blit(mainFont.render(message, True, color['white']),position)
+
+
+def multi(screen, enteredip, mousex = -1, mousey = -1, mouseClicked = False):
+    menu = '[F1] Singleplayer Game   |   [F2] Network Game   |   [F3] Quit   |   [F4] Main Menu'
     # set font
     mainFont = pygame.font.Font('resources/Vera.ttf', 16)
-
-    # draw title background
-    gameSurface = pygame.Surface((800, 20))
-    gameSurface.set_alpha(200)
-    screen.fill(color['white'])
-    screen.blit(gameSurface, (0, 0))
+    screen.fill(color['black'])
 
     # draw title text, centered
-    gameText = mainFont.render(menu, False, color['white'])
+    gameText = mainFont.render(menu, True, color['white'])
     gameRect = gameText.get_rect()
-    gameRect.centerx = 400
+    gameRect.center = (400, 18)
+
     screen.blit(gameText, gameRect)
+
+    netstatus = "In progress..."
+    ip = "Unknown"
+    ip = getIP()
+
+    mainstring = """Welcome to Battleship Multiplayer!
+
+===== Instructions =====
+
+In order for multiplayer to work, you must have an internet connection (duh!)
+
+If you are planning to host the server, then give your IP address (shown below!) to your friend and then click the "Create Server" button.
+
+If you are connecting to a friend's server, type in your friend's IP address in the box below, and then click the "Join Server" button.
+
+There is a 60 second time limit on moves or your turn will be forfeit! If you forfeit three turns in a row, you will lose the game!
+
+===== Information =====
+
+Testing for a network connection: {0}
+
+Your IP is: {1}
+
+""".format(netstatus, ip)
+    stringrect = pygame.Rect((45, 45, 710, 450))
+
+    offset = 10
+
+    backgroundbox = (stringrect.left - offset, stringrect.top - offset, stringrect.width + offset * 2, stringrect.height + offset * 2)
+
+    rendered_text = textrect.render_textrect(mainstring, mainFont, stringrect, color['white'], color['gray'], 0)
+
+    pygame.draw.rect(screen, color['gray'],backgroundbox)
+    
+    screen.blit(rendered_text, (45,45))
+    
+    topoffset = 540
+    buttonspacing = 30
+
+    # load a singleplayer button, draw to screen
+    createserverButton = Button((50,topoffset),"Create Server")
+    if (createserverButton.getBounds().collidepoint(mousex, mousey)):
+        createserverButton.highlighted(screen)
+    createserverButton.draw(screen)
+
+    # load a multiplayer button, draw to screen
+    joinserverButton = Button((createserverButton.getBounds().right + buttonspacing, topoffset),"Join Server" + " "*31)
+    if (joinserverButton.getBounds().collidepoint(mousex, mousey)):
+        joinserverButton.highlighted(screen)
+    joinserverButton.draw(screen)
+    
+    # load a quit button, draw to screen
+    menuButton = Button((joinserverButton.getBounds().right + buttonspacing, topoffset),"Main Menu")
+    if (menuButton.getBounds().collidepoint(mousex, mousey)):
+        menuButton.highlighted(screen)
+    menuButton.draw(screen)
+    
+    gamemode = 0
+
+    textbox(screen, (joinserverButton.getBounds().centerx-25,topoffset),enteredip)
+    
+    if (mouseClicked):
+        if (createserverButton.getBounds().collidepoint(mousex, mousey)):
+            gamemode = 1
+        elif (joinserverButton.getBounds().collidepoint(mousex, mousey)):
+            gamemode = 2
+        elif (menuButton.getBounds().collidepoint(mousex, mousey)):
+            gamemode = 3
+
+    return gamemode
 
 
 def drawboards(attackboard, playerboard, screen, xm1, xm2):
@@ -263,6 +349,8 @@ def main(argv):
     title(screen)
     gamemode = 0
     gamestarted = 0
+
+    enteredip = []
     
     while 1:
         mouseClicked = False
@@ -297,6 +385,15 @@ def main(argv):
                 mousex, mousey = event.pos
                 mouseClicked = True
 
+            # Blanket catch for any other key press, keep this at the end!
+            elif event.type == KEYDOWN:
+                if event.key == K_BACKSPACE:
+                    enteredip = enteredip[0:-1]
+                elif event.key == K_RETURN:
+                    pass
+                elif (event.key >= 48 and event.key <= 57) or event.key == 46:
+                    enteredip.append(chr(event.key))
+
         # If we're in gamemode 0, show the titlescreen
         if (gamemode == 0):
             gamemode = title(screen, mousex, mousey, mouseClicked)
@@ -330,7 +427,7 @@ def main(argv):
 
         # If we're in gamemode 2, show the multiplayer screen
         if (gamemode == 2):
-            multi(screen)
+            multi(screen, "".join(enteredip), mousex, mousey, mouseClicked)
             pass
 
         # If we're in gamemode 3, we're quitting
@@ -345,7 +442,7 @@ def main(argv):
             pygame.display.update()
             print('Quitting :[')
 
-            pygame.time.wait(500)
+            #pygame.time.wait(500)
             pygame.quit()
             sys.exit(0)
         # redraw screen       
