@@ -13,22 +13,22 @@ class board(object):
 				 [0,0,0,0,0,0,0,0,0,0]]
 	
 	def setpiece(self, piece, row, col):
-			self.gameboard[row][col] = piece
+			self.gameboard[col][row] = piece
 			
 	def returnpiece(self, row, col):
-			return self.gameboard[row][col]
+			return self.gameboard[col][row]
 		
 	def checkforhitormiss(self, row, col):
 		hold = self.returnpiece(row, col)
-		if hold != 7 or hold != 8:
+		if hold != 7 and hold != 8:
 			if hold == 0:
 				self.setpiece(7, row, col)
-				return 'miss'
+				return 7
 			else:
 				self.setpiece(8, row, col)
-				return 'hit'
+				return hold
 		else:
-			return 'Pick another Space'
+			return 9
 		
 	def returnboard(self):
 		return self.gameboard

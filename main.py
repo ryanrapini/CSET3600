@@ -21,9 +21,8 @@ WINDOWHEIGHT = 600
 XMARGIN = int((WINDOWWIDTH - (BOARDWIDTH * (BOXSIZE + GAPSIZE))) / 6)
 XMARGIN2 = int((WINDOWWIDTH - (BOARDWIDTH * (BOXSIZE + GAPSIZE))) / 1.15)
 YMARGIN = int((WINDOWHEIGHT - (BOARDHEIGHT * (BOXSIZE + GAPSIZE))) / 2)
-HIGHLIGHTCOLOR = color['blue']
+
 shiparray = [6,5,4,3,2]
-piecevalue = 1
 
 def loadSound():
     pygame.mixer.pre_init(44100, -16, 2, 2048)  # setup mixer
@@ -179,12 +178,12 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     
 def single(screen):
     menu = 'Press F1 for new single Game, F2 for network game, F3 to quit game, F4 to return to menu'
-
+    menu2 = 'Click to place ships down from point, hold space and click to place ships right from point'
     # set font
     mainFont = pygame.font.Font('resources/Vera.ttf', 16)
 
     # draw title background
-    gameSurface = pygame.Surface((800, 20))
+    gameSurface = pygame.Surface((800, 40))
     gameSurface.set_alpha(200)
     screen.fill(color['white'])
     screen.blit(gameSurface, (0, 0))
@@ -195,11 +194,19 @@ def single(screen):
     gameRect.centerx = 400
     screen.blit(gameText, gameRect)
     
+    # draw title text, centered
+    gameText = mainFont.render(menu2, False, color['white'])
+    gameRect = gameText.get_rect()
+    gameRect.centerx = 400
+    gameRect.top = 20
+    screen.blit(gameText, gameRect)
+    
     myfont = pygame.font.SysFont('resources/alphbeta.ttf', 25)
     label = myfont.render("Attack Board", 1, (255,0,0))
     screen.blit(label, (XMARGIN+90, 100))
     label2 = myfont.render("Player Board", 1, (255,0,0))
     screen.blit(label2, (XMARGIN2+90, 100))
+    
 
 
 def textbox(screen, position, message):
@@ -310,29 +317,47 @@ def drawboards(attackboard, playerboard, screen, xm1, xm2):
             left1, top1 = whereisbox(x, y, xm1)
             left2, top2 = whereisbox(x, y, xm2)
             if (attackboard.returnpiece(x,y) == 0):
-            	pygame.draw.rect(screen, BLANKCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
+                pygame.draw.rect(screen, BLANKCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
             elif (attackboard.returnpiece(x,y) == 1):
                 pygame.draw.rect(screen, MISSCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
             elif (attackboard.returnpiece(x,y) == 7):
                 pygame.draw.rect(screen, MISSCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
-            elif (attackboard.returnpiece(x,y) == 8):
-            	pygame.draw.rect(screen, HITCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
+            elif (attackboard.returnpiece(x,y) == 2) or (attackboard.returnpiece(x,y) == 3) or (attackboard.returnpiece(x,y) == 4) or (attackboard.returnpiece(x,y) == 5) or (attackboard.returnpiece(x,y) == 6):
+                pygame.draw.rect(screen, HITCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
             if (playerboard.returnpiece(x,y) == 0):
                 pygame.draw.rect(screen, BLANKCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
             elif (playerboard.returnpiece(x,y) == 1):
                 pygame.draw.rect(screen, MISSCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+            elif (playerboard.returnpiece(x,y) == 2) or (playerboard.returnpiece(x,y) == 3) or (playerboard.returnpiece(x,y) == 4) or (playerboard.returnpiece(x,y) == 5) or (playerboard.returnpiece(x,y) == 6):
+                pygame.draw.rect(screen, SHIPCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
             elif (playerboard.returnpiece(x,y) == 7):
                 pygame.draw.rect(screen, MISSCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
             elif (playerboard.returnpiece(x,y) == 8):
                 pygame.draw.rect(screen, HITCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+                            
+def checkforwin(board):
+    winarray = [0,0,0,0,0,0,0,0]
+    win = False
+    for x in range(BOARDWIDTH):
+        for y in range(BOARDHEIGHT):
+            temp = board.returnpiece(x,y)
+            winarray[temp] = winarray[temp] + 1
+    temp2 = 2
+    while(temp2 < 7):
+        if winarray[temp2] == temp2:
+            win = True
+        else:
+            win = False
+            break
+        temp2 = temp2 + 1
+    return win
             
 def whereisbox(boxx, boxy, xm):
     # Convert board coordinates to pixel coordinates
     left = boxx * (BOXSIZE + GAPSIZE) + xm
     top = boxy * (BOXSIZE + GAPSIZE) + YMARGIN
     return (left, top)
-
-   
+    
 def whatbox(x, y, xm):
     for boxx in range(BOARDWIDTH):
         for boxy in range(BOARDHEIGHT):
@@ -341,14 +366,16 @@ def whatbox(x, y, xm):
             if boxRect.collidepoint(x, y):
                 return (boxx, boxy)
     return (None, None)
-
-
+   
 def main(argv):
     screen = init()
     print ("Drawing main menu.")
     title(screen)
     gamemode = 0
     gamestarted = 0
+    spacetaken = 0
+    direction = 0
+    turn = 0
 
     enteredip = []
     
@@ -403,27 +430,58 @@ def main(argv):
             if (gamestarted == 0):
                 print ("Starting a new game")
                 single(screen)
+                gamestarted = 0
+                place = 0
+                spacetaken = 0
+                turn = 0
                 playerboard = board()
                 playerattackboard = board()
                 cpuboard = board()
                 cpuattackboard = board()
                 comp = AI()
-                comp.placeships(shiparray, piecevalue, playerboard)
+                comp.placeships(shiparray, cpuboard)
                 gamestarted = 1
             else:
                 drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
-                boxx, boxy = whatbox(mousex, mousey, XMARGIN)
                 boxx2, boxy2 = whatbox(mousex, mousey, XMARGIN2)
-                if (boxx != None and boxy != None):
-                    if mouseClicked:
-                        print(boxx, boxy)
-                        test = playerattackboard.returnpiece(boxx,boxy)
-                        print(test)
-                elif (boxx2 != None and boxy2 != None) and mouseClicked:
-                    if mouseClicked:
-                        print(boxx2, boxy2)
-                        test = playerboard.returnpiece(boxx2,boxy2)
-                        print(test)
+                # user places ships on board
+                if (boxx2 != None and boxy2 != None) and mouseClicked:
+                    if (place < 5):
+                        spacepressed = pressed[pygame.K_SPACE]
+                        if not (spacepressed):
+                            for y in range(shiparray[place]): 
+                                playerboard.setpiece(shiparray[place],boxx2,boxy2)
+                                boxy2 = boxy2 + 1
+                                if (y == (shiparray[place]-1)):
+                                    place = place + 1
+                        elif (spacepressed):
+                            for x in range(shiparray[place]): 
+                                playerboard.setpiece(shiparray[place],boxx2,boxy2)
+                                boxx2 = boxx2 + 1
+                                if (x == (shiparray[place]-1)):
+                                    place = place + 1
+                boxx, boxy = whatbox(mousex, mousey, XMARGIN)
+                # game ready to play
+                if (place == 5):
+                    if (turn == 0):
+                        if (boxx != None and boxy != None) and mouseClicked:
+                            temp = cpuboard.checkforhitormiss(boxx,boxy)
+                            if (temp == 9):
+                                blah = 0
+                            else:
+                                playerattackboard.setpiece(temp,boxx,boxy)
+                                if (checkforwin(playerattackboard)):
+                                    print('You win')
+                                    turn = -1
+                                else:
+                                    turn = 1
+                    elif (turn == 1):
+                        comp.attack(playerboard, cpuattackboard)
+                        if (checkforwin(cpuattackboard)):
+                            print('Computer wins')
+                            turn = -1
+                        else:
+                            turn = 0        
 
         # If we're in gamemode 2, show the multiplayer screen
         if (gamemode == 2):
