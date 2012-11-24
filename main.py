@@ -450,17 +450,19 @@ def main(argv):
                     if (place < 5):
                         spacepressed = pressed[pygame.K_SPACE]
                         if not (spacepressed):
-                            for y in range(shiparray[place]): 
-                                playerboard.setpiece(shiparray[place],boxx2,boxy2)
-                                boxy2 = boxy2 + 1
-                                if (y == (shiparray[place]-1)):
-                                    place = place + 1
+                            if ((shiparray[place]+boxy2) < 11):
+                                for y in range(shiparray[place]): 
+                                    playerboard.setpiece(shiparray[place],boxx2,boxy2)
+                                    boxy2 = boxy2 + 1
+                                    if (y == (shiparray[place]-1)):
+                                        place = place + 1
                         elif (spacepressed):
-                            for x in range(shiparray[place]): 
-                                playerboard.setpiece(shiparray[place],boxx2,boxy2)
-                                boxx2 = boxx2 + 1
-                                if (x == (shiparray[place]-1)):
-                                    place = place + 1
+                            if ((shiparray[place]+boxx2) < 11):
+                                for x in range(shiparray[place]): 
+                                    playerboard.setpiece(shiparray[place],boxx2,boxy2)
+                                    boxx2 = boxx2 + 1
+                                    if (x == (shiparray[place]-1)):
+                                        place = place + 1
                 boxx, boxy = whatbox(mousex, mousey, XMARGIN)
                 # game ready to play
                 if (place == 5):
