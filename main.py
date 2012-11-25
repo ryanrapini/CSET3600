@@ -178,12 +178,12 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     
 def single(screen):
     menu = 'Press F1 for new single Game, F2 for network game, F3 to quit game, F4 to return to menu'
-    menu2 = 'Click to place ships down from point, hold space and click to place ships right from point'
+    #menu2 = 'Click to place ships down from point, hold space and click to place ships right from point'
     # set font
     mainFont = pygame.font.Font('resources/Vera.ttf', 16)
 
     # draw title background
-    gameSurface = pygame.Surface((800, 40))
+    gameSurface = pygame.Surface((800, 20))
     gameSurface.set_alpha(200)
     screen.fill(color['white'])
     screen.blit(gameSurface, (0, 0))
@@ -195,11 +195,11 @@ def single(screen):
     screen.blit(gameText, gameRect)
     
     # draw title text, centered
-    gameText = mainFont.render(menu2, False, color['white'])
-    gameRect = gameText.get_rect()
-    gameRect.centerx = 400
-    gameRect.top = 20
-    screen.blit(gameText, gameRect)
+    #gameText = mainFont.render(menu2, False, color['white'])
+    #gameRect = gameText.get_rect()
+    #gameRect.centerx = 400
+    #gameRect.top = 20
+    #screen.blit(gameText, gameRect)
     
     myfont = pygame.font.SysFont('resources/alphbeta.ttf', 25)
     label = myfont.render("Attack Board", 1, (255,0,0))
@@ -207,7 +207,19 @@ def single(screen):
     label2 = myfont.render("Player Board", 1, (255,0,0))
     screen.blit(label2, (XMARGIN2+90, 100))
     
-
+def singleinstructions(screen, text, text2, yloc, yloc2):
+    single(screen)
+    myfont = pygame.font.SysFont('resources/alphbeta.ttf', 25)
+    label = myfont.render(text, 1, (255,0,0))
+    screen.blit(label, (200, yloc))
+    label2 = myfont.render(text2, 1, (255,0,0))
+    screen.blit(label2, (20, yloc2))
+    
+def printstatus(screen, text):
+    single(screen)
+    myfont = pygame.font.SysFont('resources/alphbeta.ttf', 25)
+    label4 = myfont.render(text, 1, (255,0,0))
+    screen.blit(label4, (200, 475))
 
 def textbox(screen, position, message):
     """
@@ -351,6 +363,25 @@ def checkforwin(board):
             break
         temp2 = temp2 + 1
     return win
+
+def checkforshipsunk(board, piece, screen):
+    sunk = False
+    hold = 0
+    for x in range(BOARDWIDTH):
+        for y in range(BOARDHEIGHT):
+            if (board.returnpiece(x,y) == piece):
+               hold = hold + 1
+    if (hold == piece):
+        if (piece == 6):
+            printstatus(screen, 'You sunk my Aircraft Carrier!')
+        elif (piece == 5):
+            printstatus(screen, 'You sunk my Battleship!')
+        elif (piece == 4):
+            printstatus(screen, 'You sunk my Submarine!')
+        elif (piece == 3):
+            printstatus(screen, 'You sunk my Destroyer!')
+        elif (piece == 2):
+            printstatus(screen, 'You sunk my Patrol Boat!')
             
 def whereisbox(boxx, boxy, xm):
     # Convert board coordinates to pixel coordinates
@@ -443,45 +474,86 @@ def main(argv):
                 comp.placeships(shiparray, cpuboard)
                 gamestarted = 1
             else:
+                if (place == 0):
+                    singleinstructions(screen, 'Please place the Aircraft Carrier on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+                elif (place == 1):
+                    singleinstructions(screen, 'Please place the Battleship on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+                elif (place == 2):
+                    singleinstructions(screen, 'Please place the Submarine on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+                elif (place == 3):
+                    singleinstructions(screen, 'Please place the Destroyer on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+                elif (place == 4):
+                    singleinstructions(screen, 'Please place the Patrol Boat on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+                elif (place == 5):
+                    singleinstructions(screen, 'Please select spot on attack board to start game', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+                #else:
+                    #singleinstructions(screen, '', '', 475, 500)
                 drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
                 boxx2, boxy2 = whatbox(mousex, mousey, XMARGIN2)
                 # user places ships on board
                 if (boxx2 != None and boxy2 != None) and mouseClicked:
                     if (place < 5):
+                        checkplace = 0
                         spacepressed = pressed[pygame.K_SPACE]
                         if not (spacepressed):
+                            hold = boxy2
                             if ((shiparray[place]+boxy2) < 11):
+                                if (checkplace == 0):
+                                    for y in range(shiparray[place]): 
+                                        if ((playerboard.returnpiece(boxx2,hold)) != 0):
+                                            checkplace = 1
+                                        else:
+                                            hold = hold + 1
                                 for y in range(shiparray[place]): 
-                                    playerboard.setpiece(shiparray[place],boxx2,boxy2)
-                                    boxy2 = boxy2 + 1
-                                    if (y == (shiparray[place]-1)):
-                                        place = place + 1
+                                    if (checkplace == 1):
+                                        break
+                                    else:
+                                        playerboard.setpiece(shiparray[place],boxx2,boxy2)
+                                        boxy2 = boxy2 + 1
+                                        if (y == (shiparray[place]-1)):
+                                            place = place + 1
                         elif (spacepressed):
+                            hold = boxx2
                             if ((shiparray[place]+boxx2) < 11):
+                                if (checkplace == 0):
+                                    for x in range(shiparray[place]): 
+                                        if ((playerboard.returnpiece(hold,boxy2)) != 0):
+                                            checkplace = 1
+                                        else:
+                                            hold = hold + 1
                                 for x in range(shiparray[place]): 
-                                    playerboard.setpiece(shiparray[place],boxx2,boxy2)
-                                    boxx2 = boxx2 + 1
-                                    if (x == (shiparray[place]-1)):
-                                        place = place + 1
+                                    if (checkplace == 1):
+                                        break
+                                    else:
+                                        playerboard.setpiece(shiparray[place],boxx2,boxy2)
+                                        boxx2 = boxx2 + 1
+                                        if (x == (shiparray[place]-1)):
+                                            place = place + 1
                 boxx, boxy = whatbox(mousex, mousey, XMARGIN)
                 # game ready to play
-                if (place == 5):
+                if (place >= 5):
                     if (turn == 0):
                         if (boxx != None and boxy != None) and mouseClicked:
+                            place = place + 1
                             temp = cpuboard.checkforhitormiss(boxx,boxy)
                             if (temp == 9):
                                 blah = 0
                             else:
                                 playerattackboard.setpiece(temp,boxx,boxy)
+                                if (temp == 7):
+                                    printstatus(screen, 'Miss')
+                                else:
+                                    printstatus(screen, 'Hit')
                                 if (checkforwin(playerattackboard)):
-                                    print('You win')
+                                    printstatus(screen, 'You win!')
                                     turn = -1
                                 else:
+                                    checkforshipsunk(playerattackboard, temp, screen)
                                     turn = 1
                     elif (turn == 1):
                         comp.attack(playerboard, cpuattackboard)
                         if (checkforwin(cpuattackboard)):
-                            print('Computer wins')
+                            printstatus(screen, 'Computer Wins!')
                             turn = -1
                         else:
                             turn = 0        
