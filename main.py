@@ -1,4 +1,4 @@
-import sys, pygame, os, random, textrect, socket
+import sys, pygame, os, random, textrect, socket, pygame.mixer
 from pygame.locals import *
 from board import *
 from AI import *
@@ -25,7 +25,7 @@ YMARGIN = int((WINDOWHEIGHT - (BOARDHEIGHT * (BOXSIZE + GAPSIZE))) / 2)
 shiparray = [6,5,4,3,2]
 
 def loadSound():
-    pygame.mixer.pre_init(44100, -16, 2, 2048)  # setup mixer
+    pygame.mixer.pre_init(22050, -16, 2, 4098)  # setup mixer
 
 
 def seticon():
@@ -407,6 +407,11 @@ def main(argv):
     spacetaken = 0
     direction = 0
     turn = 0
+    hit = pygame.mixer.Sound('resources\hit.ogg')
+    miss = pygame.mixer.Sound('resources\miss.ogg')
+    music = pygame.mixer.Sound('resources\TheLibertyBellMarch.ogg')
+
+    music.play(loops = -1) #continuous music
 
     enteredip = []
     
@@ -542,8 +547,10 @@ def main(argv):
                                 playerattackboard.setpiece(temp,boxx,boxy)
                                 if (temp == 7):
                                     printstatus(screen, 'Miss')
+                                    miss.play(loops = 0)
                                 else:
                                     printstatus(screen, 'Hit')
+                                    hit.play(loops = 0)
                                 if (checkforwin(playerattackboard)):
                                     printstatus(screen, 'You win!')
                                     turn = -1
@@ -571,6 +578,7 @@ def main(argv):
             thanksRect = thanks.get_rect()
             thanksRect.center = (400, 300)
             screen.blit(thanks, thanksRect)
+            pygame.mixer.quit()
 
             pygame.display.update()
             print('Quitting :[')
