@@ -580,10 +580,12 @@ def main(argv):
             screen.blit(thanks, thanksRect)
             pygame.mixer.quit()
 
+
+
             pygame.display.update()
             print('Quitting :[')
 
-            #pygame.time.wait(500)
+            pygame.time.wait(1500)
             pygame.quit()
             sys.exit(0)
         # redraw screen       
