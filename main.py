@@ -189,10 +189,10 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
 
     
 def single(screen):
-    menu = 'Press F1 for new easy single Game, F2 for new hard single Game, F3 for network game, F4 to quit game, F5 to return to menu'
+    menu = '[F1] Easy Singleplayer Game | [F2] Hard Singleplayer Game | [F3] Network Game | [F4] Quit | [F5] Main Menu'
     #menu2 = 'Click to place ships down from point, hold space and click to place ships right from point'
     # set font
-    mainFont = pygame.font.Font('resources/Vera.ttf', 12)
+    mainFont = pygame.font.Font('resources/Vera.ttf', 14)
 
     # draw title background
     gameSurface = pygame.Surface((800, 16))
