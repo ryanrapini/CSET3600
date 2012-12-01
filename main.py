@@ -112,8 +112,9 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
 
     # Button positioning variables, tweak to adjust. I'd make them autocenter but I'm lazy
-    leftoffset = 35
-    topoffset = 520
+    leftoffset = 75
+    topoffset = 475
+    topoffset2 = 550
     buttonspacing = 30
 
     # set font
@@ -146,28 +147,39 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     screen.blit(subtitleText, titleRect)
 
     # load a singleplayer button, draw to screen
-    singleplayerButton = Button((leftoffset, topoffset),"Play Singleplayer [F1]")
-    if (singleplayerButton.getBounds().collidepoint(mousex, mousey)):
-        singleplayerButton.highlighted(screen)
-    singleplayerButton.draw(screen)
+    singleplayereasyButton = Button((leftoffset, topoffset),"Play Easy Singleplayer [F1]")
+    if (singleplayereasyButton.getBounds().collidepoint(mousex, mousey)):
+        singleplayereasyButton.highlighted(screen)
+    singleplayereasyButton.draw(screen)
+    
+    # load a singleplayer button, draw to screen
+    singleplayerhardButton = Button((singleplayereasyButton.getBounds().right + buttonspacing, topoffset),"Play Hard Singleplayer [F2]")
+    if (singleplayerhardButton.getBounds().collidepoint(mousex, mousey)):
+        singleplayerhardButton.highlighted(screen)
+    singleplayerhardButton.draw(screen)
 
     # load a multiplayer button, draw to screen
-    multiplayerButton = Button((singleplayerButton.getBounds().right + buttonspacing, topoffset),"Play Multiplayer [F2]")
+    multiplayerButton = Button((leftoffset, topoffset2),"     Play Multiplayer [F3]     ")
     if (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
         multiplayerButton.highlighted(screen)
     multiplayerButton.draw(screen)
     
     # load a quit button, draw to screen
-    quitButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset),"Quit Game [F3]")
+    quitButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset2),"         Quit Game [F4]         ")
     if (quitButton.getBounds().collidepoint(mousex, mousey)):
         quitButton.highlighted(screen)
     quitButton.draw(screen)
     
     gamemode = 0
+    global gamedifficulty
     
     if (mouseClicked):
-        if (singleplayerButton.getBounds().collidepoint(mousex, mousey)):
+        if (singleplayereasyButton.getBounds().collidepoint(mousex, mousey)):
             gamemode = 1
+            gamedifficulty = 0
+        elif (singleplayerhardButton.getBounds().collidepoint(mousex, mousey)):
+            gamemode = 1
+            gamedifficulty = 1
         elif (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
             gamemode = 2
         elif (quitButton.getBounds().collidepoint(mousex, mousey)):
@@ -177,13 +189,13 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
 
     
 def single(screen):
-    menu = 'Press F1 for new single Game, F2 for network game, F3 to quit game, F4 to return to menu'
+    menu = 'Press F1 for new easy single Game, F2 for new hard single Game, F3 for network game, F4 to quit game, F5 to return to menu'
     #menu2 = 'Click to place ships down from point, hold space and click to place ships right from point'
     # set font
-    mainFont = pygame.font.Font('resources/Vera.ttf', 16)
+    mainFont = pygame.font.Font('resources/Vera.ttf', 12)
 
     # draw title background
-    gameSurface = pygame.Surface((800, 20))
+    gameSurface = pygame.Surface((800, 16))
     gameSurface.set_alpha(200)
     screen.fill(color['white'])
     screen.blit(gameSurface, (0, 0))
@@ -236,9 +248,9 @@ def textbox(screen, position, message):
 
 
 def multi(screen, enteredip, mousex = -1, mousey = -1, mouseClicked = False):
-    menu = '[F1] Singleplayer Game   |   [F2] Network Game   |   [F3] Quit   |   [F4] Main Menu'
+    menu = '[F1] Easy Singleplayer Game  |  [F2] Hard Singleplayer Game  |  [F3] Network Game  |  [F4] Quit  |  [F5] Main Menu'
     # set font
-    mainFont = pygame.font.Font('resources/Vera.ttf', 16)
+    mainFont = pygame.font.Font('resources/Vera.ttf', 12)
     screen.fill(color['black'])
 
     # draw title text, centered
@@ -403,6 +415,7 @@ def main(argv):
     print ("Drawing main menu.")
     title(screen)
     gamemode = 0
+    global gamedifficulty
     gamestarted = 0
     spacetaken = 0
     direction = 0
@@ -427,16 +440,22 @@ def main(argv):
             elif pressed[pygame.K_F1]:
                 gamemode = 1
                 gamestarted = 0
+                gamedifficulty = 0
             # If the user presses F2
             elif pressed[pygame.K_F2]:
-                gamemode = 2
+                gamemode = 1
                 gamestarted = 0
+                gamedifficulty = 1
             # If the user presses F3
             elif pressed[pygame.K_F3]:
-                gamemode = 3
-
+                gamemode = 2
+                gamestarted = 0
             # If the user presses F4
             elif pressed[pygame.K_F4]:
+                gamemode = 3
+
+            # If the user presses F5
+            elif pressed[pygame.K_F5]:
                 gamemode = 0
                 gamestarted = 0
 
@@ -558,7 +577,10 @@ def main(argv):
                                     checkforshipsunk(playerattackboard, temp, screen)
                                     turn = 1
                     elif (turn == 1):
-                        comp.attack(playerboard, cpuattackboard)
+                        if (gamedifficulty == 0):
+                            comp.attack(playerboard, cpuattackboard)
+                        elif (gamedifficulty == 1):
+                            comp.attack2(playerboard, cpuattackboard)
                         if (checkforwin(cpuattackboard)):
                             printstatus(screen, 'Computer Wins!')
                             turn = -1
