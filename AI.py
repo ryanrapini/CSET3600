@@ -5,6 +5,13 @@ class AI():
     def __init__(self):
         self.attackmode = 0
         self.targettype = 1
+        self.originalx = 0
+        self.originaly = 0
+        self.direction = 0
+        self.turntaken = 0
+        self.targettype = 0
+        self.temp2 = 0
+        boom = 1
     
     def placeships(self, shiparray, board):
         totalships = len(shiparray)
@@ -61,6 +68,94 @@ class AI():
         
         
     def attack2(self, playerboard, cpuattackboard):
+        #this AI is harder but doesn't cheat
+        if self.attackmode == 0:
+            row = random.randint(0,9)
+            col = random.randint(0,9)
+            temp = playerboard.checkforhitormiss(row, col)
+            while temp == 9:
+                row = random.randint(0,9)
+                col = random.randint(0,9)
+                temp = playerboard.checkforhitormiss(row, col)
+            cpuattackboard.setpiece(temp,row,col)
+            if (temp == 2) or (temp == 3) or (temp == 3) or (temp == 4) or (temp == 5) or (temp == 6):
+                self.attackmode = 1
+                self.originalx = col
+                self.originaly = row
+                self.boom = 1
+                self.direction = 0
+                self.targettype = temp
+                
+        elif self.attackmode == 1:
+            #check up
+            if (self.turntaken == 0) and (self.direction == 0) and (self.originalx - self.boom >= 0) and (cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom) == 0):
+                    self.temp2 = playerboard.checkforhitormiss(self.originaly, self.originalx - self.boom)
+                    cpuattackboard.setpiece(self.temp2,self.originaly,self.originalx - self.boom)
+                    self.boom = self.boom + 1
+                    self.turntaken = 1
+                    print(self.targettype)
+                    print(cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom))
+                    if (self.temp2 == 7) or (cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom) != 0):
+                        self.direction = 1
+                        self.boom = 1
+                        print(self.targettype)
+                        print(cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom))
+            elif (self.direction == 0) and ((self.originalx - self.boom < 0) or (cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom) == 7)):
+                        self.direction = 1
+                        self.boom = 1
+            
+            #check down   
+            if (self.turntaken == 0) and (self.direction == 1) and (self.originalx + self.boom < 10) and (cpuattackboard.returnpiece(self.originaly, self.originalx + self.boom) == 0):
+                    self.temp2 = playerboard.checkforhitormiss(self.originaly, self.originalx + self.boom)
+                    cpuattackboard.setpiece(self.temp2,self.originaly,self.originalx + self.boom)
+                    self.boom = self.boom + 1
+                    self.turntaken = 1
+                    if (self.temp2 == 7) or (cpuattackboard.returnpiece(self.originaly, self.originalx + self.boom) != 0):
+                        self.direction = 2
+                        self.boom = 1
+            elif (self.direction == 1) and ((self.originalx + self.boom > 9) or (cpuattackboard.returnpiece(self.originaly, self.originalx + self.boom) == 7)):
+                        self.direction = 2
+                        self.boom = 1
+                        
+            #check left
+            if (self.turntaken == 0) and (self.direction == 2) and (self.originaly - self.boom >= 0) and (cpuattackboard.returnpiece(self.originaly - self.boom, self.originalx) == 0):
+                    self.temp2 = playerboard.checkforhitormiss(self.originaly - self.boom, self.originalx)
+                    cpuattackboard.setpiece(self.temp2,self.originaly - self.boom,self.originalx)
+                    self.boom = self.boom + 1
+                    self.turntaken = 1
+                    if (self.temp2 == 7) or (cpuattackboard.returnpiece(self.originaly - self.boom, self.originalx) != 0):
+                        self.direction = 3
+                        self.boom = 1
+            elif (self.direction == 2) and ((self.originaly - self.boom < 0) or (cpuattackboard.returnpiece(self.originaly - self.boom, self.originalx) == 7)):
+                        self.direction = 3
+                        self.boom = 1
+                        
+            #check right
+            if (self.turntaken == 0) and (self.direction == 3) and (self.originaly + self.boom < 10) and (cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) == 0):
+                    self.temp2 = playerboard.checkforhitormiss(self.originaly + self.boom, self.originalx)
+                    cpuattackboard.setpiece(self.temp2,self.originaly + self.boom,self.originalx)
+                    self.boom = self.boom + 1
+                    self.turntaken = 1
+                    if (self.temp2 == 7) or (cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) != 0):
+                        self.direction = 0
+                        self.boom = 1
+            elif (self.direction == 3) and ((self.originaly + self.boom > 9) or (cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) == 7)):
+                        self.direction = 0
+                        self.boom = 1
+                        
+                        
+            checkship = self.checkforshipsunk2(cpuattackboard, self.targettype)
+            
+            if (checkship == self.targettype):
+                        self.boom = 1
+                        self.direction = 0
+                        self.attackmode = 0
+                        self.targettype = 0
+                        
+            self.turntaken = 0
+            print(self.direction)
+                     
+    def attack3(self, playerboard, cpuattackboard):
         #this AI cheats
         if self.attackmode == 0:
             row = random.randint(0,9)
@@ -97,4 +192,12 @@ class AI():
         if (hold == self.targettype):
             self.attackmode = 0
             self.targettype = 1
+            
+    def checkforshipsunk2(self, board, piece):
+        hold = 0
+        for x in range(10):
+            for y in range(10):
+                if (board.returnpiece(x,y) == piece):
+                    hold = hold + 1
+        return hold
     

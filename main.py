@@ -113,6 +113,7 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
 
     # Button positioning variables, tweak to adjust. I'd make them autocenter but I'm lazy
     leftoffset = 75
+    leftoffset2 = 18
     topoffset = 475
     topoffset2 = 550
     buttonspacing = 30
@@ -147,25 +148,31 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     screen.blit(subtitleText, titleRect)
 
     # load a singleplayer button, draw to screen
-    singleplayereasyButton = Button((leftoffset, topoffset),"Play Easy Singleplayer [F1]")
+    singleplayereasyButton = Button((leftoffset2, topoffset),"Play Easy CPU [F1]")
     if (singleplayereasyButton.getBounds().collidepoint(mousex, mousey)):
         singleplayereasyButton.highlighted(screen)
     singleplayereasyButton.draw(screen)
     
     # load a singleplayer button, draw to screen
-    singleplayerhardButton = Button((singleplayereasyButton.getBounds().right + buttonspacing, topoffset),"Play Hard Singleplayer [F2]")
+    singleplayerhardButton = Button((singleplayereasyButton.getBounds().right + buttonspacing, topoffset),"Play Harder CPU [F2]")
     if (singleplayerhardButton.getBounds().collidepoint(mousex, mousey)):
         singleplayerhardButton.highlighted(screen)
     singleplayerhardButton.draw(screen)
+    
+    # load a singleplayer button, draw to screen
+    singleplayerhardestButton = Button((singleplayerhardButton.getBounds().right + buttonspacing, topoffset),"Play Hardest CPU [F3]")
+    if (singleplayerhardestButton.getBounds().collidepoint(mousex, mousey)):
+        singleplayerhardestButton.highlighted(screen)
+    singleplayerhardestButton.draw(screen)
 
     # load a multiplayer button, draw to screen
-    multiplayerButton = Button((leftoffset, topoffset2),"     Play Multiplayer [F3]     ")
+    multiplayerButton = Button((leftoffset, topoffset2),"     Play Multiplayer [F4]     ")
     if (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
         multiplayerButton.highlighted(screen)
     multiplayerButton.draw(screen)
     
     # load a quit button, draw to screen
-    quitButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset2),"         Quit Game [F4]         ")
+    quitButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset2),"         Quit Game [F12]         ")
     if (quitButton.getBounds().collidepoint(mousex, mousey)):
         quitButton.highlighted(screen)
     quitButton.draw(screen)
@@ -180,6 +187,9 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
         elif (singleplayerhardButton.getBounds().collidepoint(mousex, mousey)):
             gamemode = 1
             gamedifficulty = 1
+        elif (singleplayerhardestButton.getBounds().collidepoint(mousex, mousey)):
+            gamemode = 1
+            gamedifficulty = 2
         elif (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
             gamemode = 2
         elif (quitButton.getBounds().collidepoint(mousex, mousey)):
@@ -189,7 +199,7 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
 
     
 def single(screen):
-    menu = '[F1] Easy Singleplayer Game | [F2] Hard Singleplayer Game | [F3] Network Game | [F4] Quit | [F5] Main Menu'
+    menu = '[F1] Easy SP Game | [F2] Hard SP Game | [F3] Hardest SP Game | [F4] Network Game | [F5] Main Menu | [F12] Quit'
     #menu2 = 'Click to place ships down from point, hold space and click to place ships right from point'
     # set font
     mainFont = pygame.font.Font('resources/Vera.ttf', 14)
@@ -248,7 +258,7 @@ def textbox(screen, position, message):
 
 
 def multi(screen, enteredip, mousex = -1, mousey = -1, mouseClicked = False):
-    menu = '[F1] Easy Singleplayer Game  |  [F2] Hard Singleplayer Game  |  [F3] Network Game  |  [F4] Quit  |  [F5] Main Menu'
+    menu = '[F1] Easy SP Game  |  [F2] Hard SP Game  |  [F3] Hardest SP Game  |  [F4] Network Game  |  [F5] Main Menu  |  [F12] Quit'
     # set font
     mainFont = pygame.font.Font('resources/Vera.ttf', 12)
     screen.fill(color['black'])
@@ -448,16 +458,22 @@ def main(argv):
                 gamedifficulty = 1
             # If the user presses F3
             elif pressed[pygame.K_F3]:
-                gamemode = 2
+                gamemode = 1
                 gamestarted = 0
+                gamedifficulty = 2
             # If the user presses F4
             elif pressed[pygame.K_F4]:
-                gamemode = 3
+                gamemode = 2
+                gamestarted = 0
 
             # If the user presses F5
             elif pressed[pygame.K_F5]:
                 gamemode = 0
                 gamestarted = 0
+                
+            #If the user presses F12
+            elif pressed[pygame.K_F12]:
+                gamemode = 3
 
             # If the mouse is moved, record the current coordinates
             elif event.type == MOUSEMOTION:
@@ -581,6 +597,8 @@ def main(argv):
                             comp.attack(playerboard, cpuattackboard)
                         elif (gamedifficulty == 1):
                             comp.attack2(playerboard, cpuattackboard)
+                        elif (gamedifficulty == 2):
+                            comp.attack3(playerboard, cpuattackboard)
                         if (checkforwin(cpuattackboard)):
                             printstatus(screen, 'Computer Wins!')
                             turn = -1
