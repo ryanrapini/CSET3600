@@ -93,14 +93,25 @@ class AI():
                     cpuattackboard.setpiece(self.temp2,self.originaly,self.originalx - self.boom)
                     self.boom = self.boom + 1
                     self.turntaken = 1
-                    print(self.targettype)
-                    print(cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom))
-                    if (self.temp2 == 7) or (cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom) != 0):
+                    if (self.temp2 == 7): #or (cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom) != 0):
                         self.direction = 1
                         self.boom = 1
-                        print(self.targettype)
-                        print(cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom))
-            elif (self.direction == 0) and ((self.originalx - self.boom < 0) or (cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom) == 7)):
+            elif (self.turntaken == 0) and (self.direction == 0) and (self.originalx - self.boom >= 0) and ((cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom) != 7)) and ((cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom) != 0)):
+                    thissucks = self.originalx - self.boom
+                    self.temp2 = playerboard.checkforhitormiss(self.originaly, thissucks)  
+                    while (self.temp2 == 9) or (thissucks < 0):
+                        thissucks = thissucks - 1
+                        if (thissucks < 0):
+                            break
+                        self.temp2 = playerboard.checkforhitormiss(self.originaly, thissucks)      
+                    if (thissucks >= 0) and (self.temp2 != 9):
+                        cpuattackboard.setpiece(self.temp2, self.originaly, thissucks)       
+                        self.boom = thissucks + self.originalx
+                        self.turntaken = 1
+                    else:
+                        self.direction = 1
+                        self.boom = 1                                                                                                      
+            elif (self.turntaken == 0) and (self.direction == 0) and ((self.originalx - self.boom < 0) or (cpuattackboard.returnpiece(self.originaly, self.originalx - self.boom) == 7)):
                         self.direction = 1
                         self.boom = 1
             
@@ -110,10 +121,25 @@ class AI():
                     cpuattackboard.setpiece(self.temp2,self.originaly,self.originalx + self.boom)
                     self.boom = self.boom + 1
                     self.turntaken = 1
-                    if (self.temp2 == 7) or (cpuattackboard.returnpiece(self.originaly, self.originalx + self.boom) != 0):
+                    if (self.temp2 == 7):# or (cpuattackboard.returnpiece(self.originaly, self.originalx + self.boom) != 0):
                         self.direction = 2
                         self.boom = 1
-            elif (self.direction == 1) and ((self.originalx + self.boom > 9) or (cpuattackboard.returnpiece(self.originaly, self.originalx + self.boom) == 7)):
+            elif (self.turntaken == 0) and (self.direction == 1) and (self.originalx + self.boom < 10) and ((cpuattackboard.returnpiece(self.originaly, self.originalx + self.boom) != 7)) and ((cpuattackboard.returnpiece(self.originaly, self.originalx + self.boom) != 0)):
+                    thissucks = self.originalx + self.boom
+                    self.temp2 = playerboard.checkforhitormiss(self.originaly, thissucks)  
+                    while (self.temp2 == 9) or (thissucks > 9):
+                        thissucks = thissucks + 1
+                        if (thissucks > 9):
+                            break
+                        self.temp2 = playerboard.checkforhitormiss(self.originaly, thissucks)      
+                    if (thissucks <= 9) and (self.temp2 != 9):
+                        cpuattackboard.setpiece(self.temp2, self.originaly, thissucks)       
+                        self.boom = thissucks - self.originalx
+                        self.turntaken = 1
+                    else:
+                        self.direction = 2
+                        self.boom = 1 
+            elif (self.turntaken == 0) and (self.direction == 1) and ((self.originalx + self.boom > 9) or (cpuattackboard.returnpiece(self.originaly, self.originalx + self.boom) == 7)):
                         self.direction = 2
                         self.boom = 1
                         
@@ -123,10 +149,25 @@ class AI():
                     cpuattackboard.setpiece(self.temp2,self.originaly - self.boom,self.originalx)
                     self.boom = self.boom + 1
                     self.turntaken = 1
-                    if (self.temp2 == 7) or (cpuattackboard.returnpiece(self.originaly - self.boom, self.originalx) != 0):
+                    if (self.temp2 == 7):# or (cpuattackboard.returnpiece(self.originaly - self.boom, self.originalx) != 0):
                         self.direction = 3
                         self.boom = 1
-            elif (self.direction == 2) and ((self.originaly - self.boom < 0) or (cpuattackboard.returnpiece(self.originaly - self.boom, self.originalx) == 7)):
+            elif (self.turntaken == 0) and (self.direction == 2) and (self.originaly - self.boom >= 0) and ((cpuattackboard.returnpiece(self.originaly - self.boom, self.originalx) != 7)) and ((cpuattackboard.returnpiece(self.originaly - self.boom, self.originalx) != 0)):
+                    thissucks = self.originaly - self.boom
+                    self.temp2 = playerboard.checkforhitormiss(thissucks,self.originalx)  
+                    while (self.temp2 == 9) or (thissucks < 0):
+                        thissucks = thissucks - 1
+                        if (thissucks < 0):
+                            break
+                        self.temp2 = playerboard.checkforhitormiss(thissucks,self.originalx)      
+                    if (thissucks >= 0) and (self.temp2 != 9):
+                        cpuattackboard.setpiece(self.temp2, thissucks, self.originalx)     
+                        self.boom = thissucks + self.originaly
+                        self.turntaken = 1
+                    else:
+                        self.direction = 3
+                        self.boom = 1 
+            elif (self.turntaken == 0) and (self.direction == 2) and ((self.originaly - self.boom < 0) or (cpuattackboard.returnpiece(self.originaly - self.boom, self.originalx) == 7)):
                         self.direction = 3
                         self.boom = 1
                         
@@ -136,10 +177,25 @@ class AI():
                     cpuattackboard.setpiece(self.temp2,self.originaly + self.boom,self.originalx)
                     self.boom = self.boom + 1
                     self.turntaken = 1
-                    if (self.temp2 == 7) or (cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) != 0):
+                    if (self.temp2 == 7):# or (cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) != 0):
                         self.direction = 0
                         self.boom = 1
-            elif (self.direction == 3) and ((self.originaly + self.boom > 9) or (cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) == 7)):
+            elif (self.turntaken == 0) and (self.direction == 3) and (self.originaly - self.boom < 10) and ((cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) != 7)) and ((cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) != 0)):
+                    thissucks = self.originaly + self.boom
+                    self.temp2 = playerboard.checkforhitormiss(thissucks, self.originalx)  
+                    while (self.temp2 == 9) or (thissucks > 9):
+                        thissucks = thissucks + 1
+                        if (thissucks > 9):
+                            break
+                        self.temp2 = playerboard.checkforhitormiss(thissucks, self.originalx)      
+                    if (thissucks <= 9) and (self.temp2 != 9):
+                        cpuattackboard.setpiece(self.temp2, thissucks, self.originalx)       
+                        self.boom = thissucks - self.originaly
+                        self.turntaken = 1
+                    else:
+                        self.direction = 0
+                        self.boom = 1 
+            elif (self.turntaken == 0) and (self.direction == 3) and ((self.originaly + self.boom > 9) or (cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) == 7)):
                         self.direction = 0
                         self.boom = 1
                         
@@ -151,9 +207,8 @@ class AI():
                         self.direction = 0
                         self.attackmode = 0
                         self.targettype = 0
-                        
+                           
             self.turntaken = 0
-            print(self.direction)
                      
     def attack3(self, playerboard, cpuattackboard):
         #this AI cheats
@@ -173,7 +228,6 @@ class AI():
             for x in range(10):
                 for y in range(10):
                     findnextpiece = playerboard.returnpiece(x,y)
-                    print(findnextpiece)
                     if (findnextpiece == self.targettype):
                         break
                 if (findnextpiece == self.targettype):
