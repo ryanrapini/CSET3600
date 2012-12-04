@@ -180,7 +180,7 @@ class AI():
                     if (self.temp2 == 7):# or (cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) != 0):
                         self.direction = 0
                         self.boom = 1
-            elif (self.turntaken == 0) and (self.direction == 3) and (self.originaly - self.boom < 10) and ((cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) != 7)) and ((cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) != 0)):
+            elif (self.turntaken == 0) and (self.direction == 3) and (self.originaly + self.boom < 10) and ((cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) != 7)) and ((cpuattackboard.returnpiece(self.originaly + self.boom, self.originalx) != 0)):
                     thissucks = self.originaly + self.boom
                     self.temp2 = playerboard.checkforhitormiss(thissucks, self.originalx)  
                     while (self.temp2 == 9) or (thissucks > 9):
