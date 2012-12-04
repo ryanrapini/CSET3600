@@ -11,7 +11,7 @@ class AI():
         self.turntaken = 0
         self.targettype = 0
         self.temp2 = 0
-        boom = 1
+        self.boom = 1
     
     def placeships(self, shiparray, board):
         totalships = len(shiparray)
