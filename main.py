@@ -25,13 +25,20 @@ YMARGIN = int((WINDOWHEIGHT - (BOARDHEIGHT * (BOXSIZE + GAPSIZE))) / 2)
 shiparray = [6,5,4,3,2]
 
 def loadSound():
-    pygame.mixer.pre_init(22050, -16, 2, 4098)  # setup mixer
+    """Loads the PyGame Sound Mixer and initializes the frequency, size, number of channels, and buffersize."""
+    # Setup mixer
+    pygame.mixer.pre_init(22050, -16, 2, 4098)
 
 
 def seticon():
+    """Sets the icon of the game.
+
+    The icon image is loaded from the resources folder and sets the image.
+
+    """
     # Call this between pygame init and drawing the first window in order to set the icon
     icon=pygame.Surface((32,32))
-    # using magic pink as transparent
+    # Using magic pink as transparent
     icon.set_colorkey((255,0,255))
     rawicon=pygame.image.load('resources/icon.bmp')
     for i in range(0,32):
@@ -40,6 +47,13 @@ def seticon():
     pygame.display.set_icon(icon)
 
 def getIP():
+    """For multiplayer purposes only.
+
+    A socket is created to report local IP addresses of the two players.
+    Once connection has been established, multiplayer games can be played.
+
+    """
+    
     # Create a dummy socket to report local IP address
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(('google.com', 0))
@@ -47,6 +61,16 @@ def getIP():
 
 
 def init():
+    """Initializes all parameters of The game.
+
+    Pygame is the first to be initialized due to the extensive use of it's libraries.
+    Sound is initialized through the loudSound class.
+    The icon for the game is set.
+    The clock is declared as a global element and the speed of the clock is set.
+    The screen for which our the funcitonal aspects of the game lie is set to sized and the window caption
+    is applied.
+
+    """
     # Initilize Pygame. THIS MUST HAPPEN BEFORE ANYTHING ELSE CAN TOUCH THE PYGAME UTILS.
     try:
         pygame.init()
@@ -79,9 +103,7 @@ def init():
 
 
 class Button:
-    """
-    Defines a button for the main outermenu.
-    """
+    """Defines a button for the main menu."""
     def __init__(self, position, text, fontsize = 22):
         self.position = position
         self.title = text
@@ -96,18 +118,32 @@ class Button:
         self.buttonDimensions = (self.buttonRect.left - self.offset, self.buttonRect.top - self.offset, self.buttonRect.width + self.offset * 2, self.buttonRect.height + self.offset * 2)
 
     def draw(self, screen):
+        """Draws buttons and places them on the screen."""
         pygame.draw.rect(screen, self.bgcolor, self.buttonDimensions)
         screen.blit(self.buttonText, self.buttonRect)
 
     def getBounds(self):
+        """Sets the size of the buttons."""
         return pygame.Rect(self.buttonDimensions)
 
     def highlighted(self, screen):
+        """If button is moused over, the background color is set to Red."""
         self.bgcolor = color['red']
 
 
 def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
-    # moved text up here for easy access.
+    """The screen of the game is displayed with many initialized parameters.
+
+    The title and subtitle are set to display the name of the game and the authors.
+    Font is loaded from the resources folder and set to the font variables.
+    The background image is loaded from the resources folder and placed as the backdrop of the menu.
+    The buttons are placed on the screen with specified locations and captions.
+    A series of if statements determine which button is clicked and calls the actions in the main arguments
+    for each respective button.
+
+    """
+    
+    # Text on the menu displaying game name and creators/masters
     title = 'Battleship'
     subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
 
@@ -118,60 +154,60 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     topoffset2 = 550
     buttonspacing = 30
 
-    # set font
+    # Set font
     mainFont = pygame.font.Font('resources/alphbeta.ttf', 100)
     subFont = pygame.font.Font('resources/alphbeta.ttf', 30)
 
-    # set background
+    # Set background
     background = 'resources/battleship.jpg'
     background_surface = pygame.image.load(background)
     screen.blit(background_surface, (0, 0))
 
-    # draw title background
+    # Draw title background
     titleSurface = pygame.Surface((800, 130))
     # make background transparent and black
     titleSurface.fill(color['black'])
     titleSurface.set_alpha(200)
     screen.blit(titleSurface, (0, 0))
 
-    # draw title text, centered
+    # Draw title text, centered
     titleText = mainFont.render(title, False, color['white'])
     titleRect = titleText.get_rect()
     titleRect.centerx = 400
     screen.blit(titleText, titleRect)
 
-    # draw subtitle text
+    # Draw subtitle text
     subtitleText = subFont.render(subtitle, False, color['white'])
     titleRect = subtitleText.get_rect()
     titleRect.centerx = 400
     titleRect.top = 90
     screen.blit(subtitleText, titleRect)
 
-    # load a singleplayer button, draw to screen
+    # Load a singleplayer button, draw to screen
     singleplayereasyButton = Button((leftoffset2, topoffset),"Play Easy CPU [F1]")
     if (singleplayereasyButton.getBounds().collidepoint(mousex, mousey)):
         singleplayereasyButton.highlighted(screen)
     singleplayereasyButton.draw(screen)
     
-    # load a singleplayer button, draw to screen
+    # Load a singleplayer button, draw to screen
     singleplayerhardButton = Button((singleplayereasyButton.getBounds().right + buttonspacing, topoffset),"Play Harder CPU [F2]")
     if (singleplayerhardButton.getBounds().collidepoint(mousex, mousey)):
         singleplayerhardButton.highlighted(screen)
     singleplayerhardButton.draw(screen)
     
-    # load a singleplayer button, draw to screen
+    # Load a singleplayer button, draw to screen
     singleplayerhardestButton = Button((singleplayerhardButton.getBounds().right + buttonspacing, topoffset),"Play Hardest CPU [F3]")
     if (singleplayerhardestButton.getBounds().collidepoint(mousex, mousey)):
         singleplayerhardestButton.highlighted(screen)
     singleplayerhardestButton.draw(screen)
 
-    # load a multiplayer button, draw to screen
+    # Load a multiplayer button, draw to screen
     multiplayerButton = Button((leftoffset, topoffset2),"     Play Multiplayer [F4]     ")
     if (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
         multiplayerButton.highlighted(screen)
     multiplayerButton.draw(screen)
     
-    # load a quit button, draw to screen
+    # Load a quit button, draw to screen
     quitButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset2),"         Quit Game [F12]         ")
     if (quitButton.getBounds().collidepoint(mousex, mousey)):
         quitButton.highlighted(screen)
@@ -199,24 +235,30 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
 
     
 def single(screen):
+    """Displays the screen for single player mode.
+
+    The menu is written onto the board with options to start a new game, return to the menu, and quit.
+    As with the main menu screen, the font and background image is set from the resources folder.
+    Labels for each playing board are drawn on the surface.
+
+    """
+    # Set font
     menu = '[F1] Easy SP Game | [F2] Hard SP Game | [F3] Hardest SP Game | [F4] Network Game | [F5] Main Menu | [F12] Quit'
-    #menu2 = 'Click to place ships down from point, hold space and click to place ships right from point'
-    # set font
     mainFont = pygame.font.Font('resources/Vera.ttf', 14)
 
-    # draw title background
+    # Draw title background
     gameSurface = pygame.Surface((800, 16))
     gameSurface.set_alpha(200)
     screen.fill(color['white'])
     screen.blit(gameSurface, (0, 0))
 
-    # draw title text, centered
+    # Draw title text, centered
     gameText = mainFont.render(menu, False, color['white'])
     gameRect = gameText.get_rect()
     gameRect.centerx = 400
     screen.blit(gameText, gameRect)
     
-    # draw title text, centered
+    # Draw title text, centered
     #gameText = mainFont.render(menu2, False, color['white'])
     #gameRect = gameText.get_rect()
     #gameRect.centerx = 400
@@ -230,6 +272,7 @@ def single(screen):
     screen.blit(label2, (XMARGIN2+90, 100))
     
 def singleinstructions(screen, text, text2, yloc, yloc2):
+    """Displays the instuctions for single play mode."""
     single(screen)
     myfont = pygame.font.SysFont('resources/alphbeta.ttf', 25)
     label = myfont.render(text, 1, (255,0,0))
@@ -238,15 +281,19 @@ def singleinstructions(screen, text, text2, yloc, yloc2):
     screen.blit(label2, (20, yloc2))
     
 def printstatus(screen, text):
+    """Displays the current status of play.
+
+    When the player hits or misses on the board, a status message displays
+    whether it was a hit or a miss.
+
+    """
     single(screen)
     myfont = pygame.font.SysFont('resources/alphbeta.ttf', 25)
     label4 = myfont.render(text, 1, (255,0,0))
     screen.blit(label4, (200, 475))
 
 def textbox(screen, position, message):
-    """
-    Prints an onscreen message
-    """
+    """Prints an onscreen message."""
     mainFont = pygame.font.Font('resources/Vera.ttf', 20)
     textbox = pygame.Rect(position[0]-10, position[1]-5, 200, 36)
 
@@ -258,12 +305,20 @@ def textbox(screen, position, message):
 
 
 def multi(screen, enteredip, mousex = -1, mousey = -1, mouseClicked = False):
+    """Displays the screen for a multiplayer game.
+
+    The menu is drawn to the screen with options to start a new game, return to the main menu, or quit.
+    Instructions for setting up a game server are printed to the screen.
+    In multiplayer mode, the game requires the ip addresses of both players.
+    More to be had here once Multiplayer is finished.
+
+    """
     menu = '[F1] Easy SP Game  |  [F2] Hard SP Game  |  [F3] Hardest SP Game  |  [F4] Network Game  |  [F5] Main Menu  |  [F12] Quit'
-    # set font
+    # Set font
     mainFont = pygame.font.Font('resources/Vera.ttf', 12)
     screen.fill(color['black'])
 
-    # draw title text, centered
+    # Draw title text, centered
     gameText = mainFont.render(menu, True, color['white'])
     gameRect = gameText.get_rect()
     gameRect.center = (400, 18)
@@ -308,19 +363,19 @@ Your IP is: {1}
     topoffset = 540
     buttonspacing = 30
 
-    # load a singleplayer button, draw to screen
+    # Load a singleplayer button, draw to screen
     createserverButton = Button((50,topoffset),"Create Server")
     if (createserverButton.getBounds().collidepoint(mousex, mousey)):
         createserverButton.highlighted(screen)
     createserverButton.draw(screen)
 
-    # load a multiplayer button, draw to screen
+    # Load a multiplayer button, draw to screen
     joinserverButton = Button((createserverButton.getBounds().right + buttonspacing, topoffset),"Join Server" + " "*31)
     if (joinserverButton.getBounds().collidepoint(mousex, mousey)):
         joinserverButton.highlighted(screen)
     joinserverButton.draw(screen)
     
-    # load a quit button, draw to screen
+    # Load a quit button, draw to screen
     menuButton = Button((joinserverButton.getBounds().right + buttonspacing, topoffset),"Main Menu")
     if (menuButton.getBounds().collidepoint(mousex, mousey)):
         menuButton.highlighted(screen)
@@ -342,6 +397,13 @@ Your IP is: {1}
 
 
 def drawboards(attackboard, playerboard, screen, xm1, xm2):
+    """Drawing of the attckboard player board, and screen are defined.
+
+    Colors are given to the spaces of where the ship is placed(green), hit(red), and where misses occur(blue.)
+    Once a box on the player or attack board has been clicked, a loop is used to determine
+    if the box clicked was a placed shit, hit, or miss.
+
+    """
     BLANKCOLOR = color['black']
     HITCOLOR = color['red']
     MISSCOLOR = color['blue']
@@ -370,6 +432,7 @@ def drawboards(attackboard, playerboard, screen, xm1, xm2):
                 pygame.draw.rect(screen, HITCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
                             
 def checkforwin(board):
+    """Checking for a win."""
     winarray = [0,0,0,0,0,0,0,0]
     win = False
     for x in range(BOARDWIDTH):
@@ -387,6 +450,7 @@ def checkforwin(board):
     return win
 
 def checkforshipsunk(board, piece, screen):
+    """Checking for a sunk ship on attack and player boards."""
     sunk = False
     hold = 0
     for x in range(BOARDWIDTH):
@@ -412,6 +476,7 @@ def whereisbox(boxx, boxy, xm):
     return (left, top)
     
 def whatbox(x, y, xm):
+    # Determines which box has been selected
     for boxx in range(BOARDWIDTH):
         for boxy in range(BOARDHEIGHT):
             left, top = whereisbox(boxx, boxy, xm)
@@ -421,6 +486,20 @@ def whatbox(x, y, xm):
     return (None, None)
    
 def main(argv):
+    """The main arguments occur.
+
+    All variables are initialized and set to the respective values, whether an integer or a class definition.
+    All mouse motion is tracked once clicked, given statements for the click event
+    such as selecting which level of game to play, sound on/off, and exiting the game execute.
+    Once a game is selected, the board loads with instructions for placing pieces  on the board.
+    The game starts as soon as the last piece(patrol boat) is placed on the player's board.
+    Once a ship has been sunk, a message will display saying that respective ship has been destroyed
+    and if the final ship is sunk, a winning message will dispaly.
+    A new game can be started at any time using the F keys to select which level of play, turn on/off sound, or
+    to return to the main menu as well as quit the game.
+    All actions on the boards are set to be logged in a seperate text file for documentation and debugging.
+
+    """
     screen = init()
     print ("Drawing main menu.")
     title(screen)
@@ -434,7 +513,8 @@ def main(argv):
     miss = pygame.mixer.Sound('resources\miss.ogg')
     music = pygame.mixer.Sound('resources\TheLibertyBellMarch.ogg')
 
-    music.play(loops = -1) #continuous music
+    # Continuous music
+    music.play(loops = -1) 
 
     enteredip = []
     
