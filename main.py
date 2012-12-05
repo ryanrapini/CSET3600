@@ -151,8 +151,8 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
 
     # Button positioning variables, tweak to adjust. I'd make them autocenter but I'm lazy
     centeroffset = 200
-    leftoffset = 75
-    leftoffset2 = 40
+    leftoffset = 55
+    leftoffset2 = 33
     topoffset = 475
     topoffset2 = 550
     buttonspacing = 30
@@ -205,7 +205,7 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     singleplayerhardestButton.draw(screen)
 
     # Load a multiplayer button, draw to screen
-    multiplayerButton = Button((leftoffset2 + 10, topoffset2)," Play Multiplayer [F4] ")
+    multiplayerButton = Button((leftoffset, topoffset2)," Play Multiplayer [F4] ")
     if (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
         multiplayerButton.highlighted(screen)
     multiplayerButton.draw(screen)
