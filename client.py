@@ -10,6 +10,10 @@ s.connect((HOST, PORT))
 
 array = [[0 for i in range(10)] for j in range(10)]
 
+preamble = s.recv(1024)
+
+print (preamble.decode())
+
 pData = pickle.dumps(array)
 print("Sending data...")
 s.sendall(pData)
