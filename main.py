@@ -104,7 +104,7 @@ def init():
 
 class Button:
     """Defines a button for the main menu."""
-    def __init__(self, position, text, fontsize = 22):
+    def __init__(self, position, text, fontsize = 20):
         self.position = position
         self.title = text
         self.offset = 15
@@ -115,7 +115,7 @@ class Button:
         self.buttonRect = self.buttonText.get_rect()
         self.buttonRect.topleft = position
 
-        self.buttonDimensions = (self.buttonRect.left - self.offset, self.buttonRect.top - self.offset, self.buttonRect.width + self.offset * 2, self.buttonRect.height + self.offset * 2)
+        self.buttonDimensions = (self.buttonRect.left - self.offset, self.buttonRect.top - self.offset, self.buttonRect.width + self.offset * 1.75, self.buttonRect.height + self.offset * 1.75)
 
     def draw(self, screen):
         """Draws buttons and places them on the screen."""
@@ -148,15 +148,16 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     subtitle = 'By Allyn Cheney, Ryan Rapini, and Edward Verhovitz'
 
     # Button positioning variables, tweak to adjust. I'd make them autocenter but I'm lazy
+    centeroffset = 200
     leftoffset = 75
-    leftoffset2 = 18
+    leftoffset2 = 40
     topoffset = 475
     topoffset2 = 550
     buttonspacing = 30
 
     # Set font
     mainFont = pygame.font.Font('resources/alphbeta.ttf', 100)
-    subFont = pygame.font.Font('resources/alphbeta.ttf', 30)
+    subFont = pygame.font.Font('resources/alphbeta.ttf', 28)
 
     # Set background
     background = 'resources/battleship.jpg'
@@ -184,13 +185,13 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     screen.blit(subtitleText, titleRect)
 
     # Load a singleplayer button, draw to screen
-    singleplayereasyButton = Button((leftoffset2, topoffset),"Play Easy CPU [F1]")
+    singleplayereasyButton = Button((leftoffset2, topoffset),"  Play Easy CPU [F1]  ")
     if (singleplayereasyButton.getBounds().collidepoint(mousex, mousey)):
         singleplayereasyButton.highlighted(screen)
     singleplayereasyButton.draw(screen)
     
     # Load a singleplayer button, draw to screen
-    singleplayerhardButton = Button((singleplayereasyButton.getBounds().right + buttonspacing, topoffset),"Play Harder CPU [F2]")
+    singleplayerhardButton = Button((singleplayereasyButton.getBounds().right + buttonspacing, topoffset)," Play Harder CPU [F2] ")
     if (singleplayerhardButton.getBounds().collidepoint(mousex, mousey)):
         singleplayerhardButton.highlighted(screen)
     singleplayerhardButton.draw(screen)
@@ -202,16 +203,23 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     singleplayerhardestButton.draw(screen)
 
     # Load a multiplayer button, draw to screen
-    multiplayerButton = Button((leftoffset, topoffset2),"     Play Multiplayer [F4]     ")
+    multiplayerButton = Button((leftoffset2 + 10, topoffset2)," Play Multiplayer [F4] ")
     if (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
         multiplayerButton.highlighted(screen)
     multiplayerButton.draw(screen)
     
+    # Load a soundOnOff button, draw to screen
+    soundButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset2)," Sound On/Off [F6] ")
+    if (soundButton.getBounds().collidepoint(mousex, mousey)):
+        soundButton.highlighted(screen)
+    soundButton.draw(screen)
+    
     # Load a quit button, draw to screen
-    quitButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset2),"         Quit Game [F12]         ")
+    quitButton = Button((soundButton.getBounds().right + buttonspacing, topoffset2),"  Quit Game [F12]  ")
     if (quitButton.getBounds().collidepoint(mousex, mousey)):
         quitButton.highlighted(screen)
     quitButton.draw(screen)
+
     
     gamemode = 0
     global gamedifficulty
@@ -243,8 +251,8 @@ def single(screen):
 
     """
     # Set font
-    menu = '[F1] Easy SP Game | [F2] Hard SP Game | [F3] Hardest SP Game | [F4] Network Game | [F5] Main Menu | [F12] Quit'
-    mainFont = pygame.font.Font('resources/Vera.ttf', 14)
+    menu = '[F1] Easy SP Game | [F2] Hard SP Game | [F3] Hardest SP Game | [F4] Network Game | [F5] Main Menu | [F6] Sound On/Off | [F12] Quit'
+    mainFont = pygame.font.Font('resources/Vera.ttf', 10)
 
     # Draw title background
     gameSurface = pygame.Surface((800, 16))
@@ -313,9 +321,9 @@ def multi(screen, enteredip, mousex = -1, mousey = -1, mouseClicked = False):
     More to be had here once Multiplayer is finished.
 
     """
-    menu = '[F1] Easy SP Game  |  [F2] Hard SP Game  |  [F3] Hardest SP Game  |  [F4] Network Game  |  [F5] Main Menu  |  [F12] Quit'
+    menu = '[F1] Easy SP Game  |  [F2] Hard SP Game  |  [F3] Hardest SP Game  |  [F4] Network Game  |  [F5] Main Menu  | [F6] Sound On/Off |  [F12] Quit'
     # Set font
-    mainFont = pygame.font.Font('resources/Vera.ttf', 12)
+    mainFont = pygame.font.Font('resources/Vera.ttf', 10)
     screen.fill(color['black'])
 
     # Draw title text, centered
@@ -550,6 +558,12 @@ def main(argv):
             elif pressed[pygame.K_F5]:
                 gamemode = 0
                 gamestarted = 0
+
+            #If the user presses F6
+            elif pressed[pygame.K_F6]:
+                pygame.mixer.pause()
+                if (pygame.mixer.pause()):
+                    pygame.mixer.unpause()
                 
             #If the user presses F12
             elif pressed[pygame.K_F12]:
