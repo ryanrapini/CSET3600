@@ -87,6 +87,8 @@ def init():
     except Exception as ex:
         print("Failed to load sound. Exception is:\n{0}".format(ex))
     else:
+        global soundon
+        soundon = 1
         print("Sound loaded sucessfully.")
 
     seticon()
@@ -209,7 +211,7 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     multiplayerButton.draw(screen)
     
     # Load a soundOnOff button, draw to screen
-    soundButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset2)," Sound On/Off [F6] ")
+    soundButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset2)," Music On/Off [F6] ")
     if (soundButton.getBounds().collidepoint(mousex, mousey)):
         soundButton.highlighted(screen)
     soundButton.draw(screen)
@@ -223,6 +225,7 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     
     gamemode = 0
     global gamedifficulty
+    global soundon
     
     if (mouseClicked):
         if (singleplayereasyButton.getBounds().collidepoint(mousex, mousey)):
@@ -238,6 +241,13 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
             gamemode = 2
         elif (quitButton.getBounds().collidepoint(mousex, mousey)):
             gamemode = 3
+        elif (soundButton.getBounds().collidepoint(mousex, mousey)):
+            if (soundon == 1):
+                pygame.mixer.pause()
+                soundon = 0
+            elif (soundon == 0):
+                pygame.mixer.unpause()
+                soundon = 1
 
     return gamemode
 
@@ -251,7 +261,7 @@ def single(screen):
 
     """
     # Set font
-    menu = '[F1] Easy SP Game | [F2] Hard SP Game | [F3] Hardest SP Game | [F4] Network Game | [F5] Main Menu | [F6] Sound On/Off | [F12] Quit'
+    menu = '[F1] Easy SP Game | [F2] Hard SP Game | [F3] Hardest SP Game | [F4] Network Game | [F5] Main Menu | [F6] Music On/Off | [F12] Quit'
     mainFont = pygame.font.Font('resources/Vera.ttf', 10)
 
     # Draw title background
@@ -321,7 +331,7 @@ def multi(screen, enteredip, mousex = -1, mousey = -1, mouseClicked = False):
     More to be had here once Multiplayer is finished.
 
     """
-    menu = '[F1] Easy SP Game  |  [F2] Hard SP Game  |  [F3] Hardest SP Game  |  [F4] Network Game  |  [F5] Main Menu  | [F6] Sound On/Off |  [F12] Quit'
+    menu = '[F1] Easy SP Game  |  [F2] Hard SP Game  |  [F3] Hardest SP Game  |  [F4] Network Game  |  [F5] Main Menu  | [F6] Music On/Off |  [F12] Quit'
     # Set font
     mainFont = pygame.font.Font('resources/Vera.ttf', 10)
     screen.fill(color['black'])
@@ -513,6 +523,7 @@ def main(argv):
     title(screen)
     gamemode = 0
     global gamedifficulty
+    global soundon
     gamestarted = 0
     spacetaken = 0
     direction = 0
@@ -564,6 +575,12 @@ def main(argv):
                 pygame.mixer.pause()
                 if (pygame.mixer.pause()):
                     pygame.mixer.unpause()
+                if (soundon == 1):
+                    pygame.mixer.pause()
+                    soundon = 0
+                elif (soundon == 0):
+                    pygame.mixer.unpause()
+                    soundon = 1
                 
             #If the user presses F12
             elif pressed[pygame.K_F12]:
