@@ -44,3 +44,4 @@ Thumbs.db
 *.sublime*
 
 __pycache__/
+logfile.txt
