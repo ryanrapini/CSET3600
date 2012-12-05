@@ -1,17 +1,8 @@
 class board(object):
 	
 	def __init__(self):
-			self.gameboard = [[0,0,0,0,0,0,0,0,0,0],
-				 [0,0,0,0,0,0,0,0,0,0],
-				 [0,0,0,0,0,0,0,0,0,0],
-				 [0,0,0,0,0,0,0,0,0,0],
-				 [0,0,0,0,0,0,0,0,0,0],
-				 [0,0,0,0,0,0,0,0,0,0],
-				 [0,0,0,0,0,0,0,0,0,0],
-				 [0,0,0,0,0,0,0,0,0,0],
-				 [0,0,0,0,0,0,0,0,0,0],
-				 [0,0,0,0,0,0,0,0,0,0]]
-	
+			self.gameboard = [[0 for i in range(10)] for j in range(10)]
+			
 	def setpiece(self, piece, row, col):
 			self.gameboard[col][row] = piece
 			
