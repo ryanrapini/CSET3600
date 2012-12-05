@@ -1,11 +1,22 @@
 # Echo client program
 import socket
+import pickle
 
 HOST = socket.gethostname()    # The remote host
-PORT = 50007              # The same port as used by the server
+PORT = 58008              # The same port as used by the server
+
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
-s.sendall(b'Hello, world')
-data = s.recv(1024)
+
+array = [[0 for i in range(10)] for j in range(10)]
+
+pData = pickle.dumps(array)
+print("Sending data...")
+s.sendall(pData)
+
+pData = s.recv(1024)
+print ("Data recieved!")
+data = pickle.loads(pData)
+print (repr(data))
+
 s.close()
-print('Received', repr(data))
