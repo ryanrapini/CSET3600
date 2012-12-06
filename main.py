@@ -3,6 +3,7 @@ from pygame.locals import *
 from board import *
 from AI import *
 
+
 color = {
 'black' : (0, 0, 0),
 'white' : (255, 255, 255),

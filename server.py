@@ -106,6 +106,7 @@ def clientthread(conn, status, turn, gameboard):
 	print("|{0}|".format(lolcats))
 	conn.close()
 
-serv = Server()
-servthread = Thread(target=serv.listen, args=())
-servthread.start()
+if __name__ == "__main__":
+	serv = Server()
+	servthread = Thread(target=serv.listen, args=())
+	servthread.start()

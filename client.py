@@ -36,16 +36,18 @@ def send_board(s):
 	else:
 		return False
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((HOST, PORT))
+		
+if __name__ == "__main__":
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.connect((HOST, PORT))
 
-preamble = get_preamble(s)
-board = get_board(s)
+	preamble = get_preamble(s)
+	board = get_board(s)
 
-if send_board(s):
-	print ("Move submitted!")
+	if send_board(s):
+		print ("Move submitted!")
 
-pp = pprint.PrettyPrinter(indent=4)
-pp.pprint (board)
+	pp = pprint.PrettyPrinter(indent=4)
+	pp.pprint (board)
 
-s.close()
+	s.close()
