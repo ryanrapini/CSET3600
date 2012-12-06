@@ -53,6 +53,9 @@ class Server(threading.Thread):
 			sys.exit(1)
 		print ('Socket bound')
 
+		# timeout after 60 seconds
+		self.s.settimeout(60)
+
 
 	def listen(self):
 		for x in range (0,2):

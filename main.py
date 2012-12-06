@@ -46,6 +46,7 @@ def seticon():
             icon.set_at((i,j), rawicon.get_at((i,j)))
     pygame.display.set_icon(icon)
 
+
 def getIP():
     """For multiplayer purposes only.
 
@@ -252,7 +253,7 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
 
     return gamemode
 
-    
+
 def single(screen):
     """Displays the screen for single player mode.
 
@@ -289,7 +290,8 @@ def single(screen):
     screen.blit(label, (XMARGIN+90, 100))
     label2 = myfont.render("Player Board", 1, (255,0,0))
     screen.blit(label2, (XMARGIN2+90, 100))
-    
+
+
 def singleinstructions(screen, text, text2, yloc, yloc2):
     """Displays the instuctions for single play mode."""
     single(screen)
@@ -298,7 +300,8 @@ def singleinstructions(screen, text, text2, yloc, yloc2):
     screen.blit(label, (200, yloc))
     label2 = myfont.render(text2, 1, (255,0,0))
     screen.blit(label2, (20, yloc2))
-    
+
+
 def printstatus(screen, text):
     """Displays the current status of play.
 
@@ -310,6 +313,7 @@ def printstatus(screen, text):
     myfont = pygame.font.SysFont('resources/alphbeta.ttf', 25)
     label4 = myfont.render(text, 1, (255,0,0))
     screen.blit(label4, (200, 475))
+
 
 def textbox(screen, position, message):
     """Prints an onscreen message."""
@@ -341,6 +345,7 @@ def multi(screen, enteredip, mousex = -1, mousey = -1, mouseClicked = False):
     gameText = mainFont.render(menu, True, color['white'])
     gameRect = gameText.get_rect()
     gameRect.center = (400, 18)
+    mainFont = pygame.font.Font('resources/Vera.ttf', 16)
 
     screen.blit(gameText, gameRect)
 
@@ -348,25 +353,16 @@ def multi(screen, enteredip, mousex = -1, mousey = -1, mouseClicked = False):
     ip = "Unknown"
     ip = getIP()
 
-    mainstring = """Welcome to Battleship Multiplayer!
-
-===== Instructions =====
-
-In order for multiplayer to work, you must have an internet connection (duh!)
-
-If you are planning to host the server, then give your IP address (shown below!) to your friend and then click the "Create Server" button.
-
-If you are connecting to a friend's server, type in your friend's IP address in the box below, and then click the "Join Server" button.
-
-There is a 60 second time limit on moves or your turn will be forfeit! If you forfeit three turns in a row, you will lose the game!
-
-===== Information =====
-
-Testing for a network connection: {0}
-
-Your IP is: {1}
-
-""".format(netstatus, ip)
+    mainstring = "Welcome to Battleship Multiplayer!\
+    \n\n===== Instructions =====\
+    \n\nIn order for multiplayer to work, you must have an internet connection (duh!)\
+    \n\nIf you are planning to host the server, then give your IP address (shown below!) to your friend and then click the 'Create Server' button.\
+    \n\nIf you are connecting to a friend's server, type in your friend's IP address in the box below, and then click the 'Join Server' button.\
+    \n\nThere is a 60 second time limit on moves or your turn will be forfeit! If you forfeit three turns in a row, you will lose the game!\
+    \n\n===== Information =====\
+    \n\nTesting for a network connection: {0}\
+    \n\nYour IP is: {1}\
+    \n\n".format(netstatus, ip)
     stringrect = pygame.Rect((45, 45, 710, 450))
 
     offset = 10
@@ -389,7 +385,7 @@ Your IP is: {1}
     createserverButton.draw(screen)
 
     # Load a multiplayer button, draw to screen
-    joinserverButton = Button((createserverButton.getBounds().right + buttonspacing, topoffset),"Join Server" + " "*31)
+    joinserverButton = Button((createserverButton.getBounds().right + buttonspacing, topoffset),"Join Server" + " "*37)
     if (joinserverButton.getBounds().collidepoint(mousex, mousey)):
         joinserverButton.highlighted(screen)
     joinserverButton.draw(screen)
@@ -449,7 +445,8 @@ def drawboards(attackboard, playerboard, screen, xm1, xm2):
                 pygame.draw.rect(screen, MISSCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
             elif (playerboard.returnpiece(x,y) == 8):
                 pygame.draw.rect(screen, HITCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
-                            
+
+
 def checkforwin(board):
     """Checking for a win."""
     winarray = [0,0,0,0,0,0,0,0]
@@ -467,6 +464,7 @@ def checkforwin(board):
             break
         temp2 = temp2 + 1
     return win
+
 
 def checkforshipsunk(board, piece, screen):
     """Checking for a sunk ship on attack and player boards."""
@@ -487,13 +485,15 @@ def checkforshipsunk(board, piece, screen):
             printstatus(screen, 'You sunk my Destroyer!')
         elif (piece == 2):
             printstatus(screen, 'You sunk my Patrol Boat!')
-            
+
+
 def whereisbox(boxx, boxy, xm):
     # Convert board coordinates to pixel coordinates
     left = boxx * (BOXSIZE + GAPSIZE) + xm
     top = boxy * (BOXSIZE + GAPSIZE) + YMARGIN
     return (left, top)
-    
+
+
 def whatbox(x, y, xm):
     # Determines which box has been selected
     for boxx in range(BOARDWIDTH):
@@ -503,7 +503,8 @@ def whatbox(x, y, xm):
             if boxRect.collidepoint(x, y):
                 return (boxx, boxy)
     return (None, None)
-   
+
+
 def main(argv):
     """The main arguments occur.
 
@@ -536,7 +537,7 @@ def main(argv):
     # Continuous music
     music.play(loops = -1) 
 
-    enteredip = []
+    enteredip = ['1','2','7','.','0','.','0','.','1']
     
     while 1:
         mouseClicked = False
@@ -749,7 +750,6 @@ def main(argv):
         # If we're in gamemode 2, show the multiplayer screen
         if (gamemode == 2):
             multi(screen, "".join(enteredip), mousex, mousey, mouseClicked)
-            pass
 
         # If we're in gamemode 3, we're quitting
         if (gamemode == 3):
