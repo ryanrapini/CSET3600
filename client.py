@@ -8,6 +8,15 @@ PORT = 58008              # The same port as used by the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 
+def preamble(s):
+	ePreamble = s.recv(1024)
+	preamble = ePreamble.decode()
+	s.send(ePreamble)
+	return preamble
+
+preamble(s)
+
+
 # def recieve():
 # 	while True:
 # 		#Receiving from client
@@ -18,7 +27,6 @@ s.connect((HOST, PORT))
 
 
 
-preamble = s.recv(1024)
 #conn.send("{0}.{1}".format(status, turn).encode()) #send only takes string
 
 # print (preamble.decode())
