@@ -53,6 +53,10 @@ def clientthread(conn, status, turn):
 		conn.sendall(pData)
 	conn.close()
 
+
+
+
 serv = Server()
-serv.listen()
+t = Thread(target=serv.listen, args=())
+t.start()
 print ("lol")
