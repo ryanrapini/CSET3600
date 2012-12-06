@@ -1,33 +1,44 @@
-# Echo client program
+# Client protocol for battleship
 import socket
 import pickle
+import pprint
 
-HOST = socket.gethostname()    # The remote host
+HOST = 'ryanrapini.com'    # The remote host
 PORT = 58008              # The same port as used by the server
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 
-def preamble(s):
+
+def get_preamble(s):
+	print ('Getting preamble...')
 	ePreamble = s.recv(1024)
 	preamble = ePreamble.decode()
 	s.send(ePreamble)
+	print ('Recieved!')
 	return preamble
 
-preamble(s)
+
+def get_board(s):
+	print ('Getting board...')
+	data = []
+	pData = s.recv(1024)
+	data += pickle.loads(pData)
+	s.send(pData)
+	print ('Recieved!')
+	return data
 
 
-# def recieve():
-# 	while True:
-# 		#Receiving from client
-# 		pData = conn.recv(1024)
-# 		if not pData: break
-# 		data = pickle.loads(pData)
-# 		conn.sendall(pData)
+def send_board(s):
+	pass
 
+preamble = get_preamble(s)
+board = get_board(s)
 
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint (board)
 
-#conn.send("{0}.{1}".format(status, turn).encode()) #send only takes string
+#s.send("{0}.{1}".format(status, turn).encode()) #send only takes string
 
 # print (preamble.decode())
 
@@ -36,9 +47,7 @@ preamble(s)
 # data = pickle.loads(pData)
 # print (repr(data))
 
-# pData = pickle.dumps(array)
-# print("Sending data...")
-# s.sendall(pData)
+
 
 
 

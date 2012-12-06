@@ -1,4 +1,34 @@
-# Echo server program
+# Server protocol for battleship
+
+# A quick note on technical limitations: for the sake of this project's simplicity and my own
+# sanity, I make a pretty risky assumption about my sockets: that every single communication
+# will successfully send all 1024 bytes in one go.
+
+# Naturally, when you are in a networking environment there are hundreds of factors that may
+# affect the fidelity of the connection and this represents a bit of a risk. However, in our
+# case we appear to come well within the 1024 byte limit for a single transmit.
+
+# our data array (the only significant thing we are sending) comes in at 192 bytes, empty:
+# >>> sys.getsizeof([[0 for i in range(10)] for j in range(10)])
+# 192
+
+# of course, pickling it for serialization introduces significant size overhead:
+# >>> import pickle
+# >>> sys.getsizeof(pickle.dumps([[0 for i in range(10)] for j in range(10)]))
+# 507
+
+# but even with a fully populated array, we seem to be just fine:
+# >>> sys.getsizeof(pickle.dumps([[256 for i in range(10)] for j in range(10)]))
+# 707
+
+# of course, staying under the size requirement isn't a guarantee, but it certainly makes me
+# feel better. There is a possibility of transmission failures due to other network issues, but
+# the code should mostly compensate for these by virtue of constantly updating - if the data array
+# is transmitted mashed in one pass, it should be corrected on the next pass. this is further
+# enforced by the fact that our server is authoritative and will contain the One True State of our
+# game board, from which both clients will update.
+
+
 import socket
 import pickle
 import sys
@@ -33,7 +63,7 @@ class Server(threading.Thread):
 			self.conn, addr = self.s.accept()
 			print('Connected by', addr)
 			
-			t = Thread(target=clientthread, args=(self.conn,self.status,self.turn))
+			t = Thread(target=clientthread, args=(self.conn,self.status,self.turn,self.array))
 			t.start()
 		self.stop()
 
@@ -41,13 +71,21 @@ class Server(threading.Thread):
 		self.s.close()
 
 
-def clientthread(conn, status, turn):
+def clientthread(conn, status, turn, array):
 	ePreamble = "{0}.{1}".format(status, turn).encode()
 	conn.send(ePreamble) #send only takes string
 	ePreambleRecv = conn.recv(1024)
 
 	if (ePreamble == ePreambleRecv):
 		print ("Preamble OK")
+
+	pData = pickle.dumps(array)
+	print("Sending data...")
+	conn.send(pData)
+	pDataRecv = conn.recv(1024)
+
+	if (pDataRecv == pDataRecv):
+		print ("Data OK")
 
 	# # keep thread alive with infinite loop
 	# while True:
