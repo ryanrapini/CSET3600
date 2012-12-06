@@ -109,7 +109,7 @@ def init():
 
 class Button:
     """Defines a button for the main menu."""
-    def __init__(self, position, text, fontsize = 20):
+    def __init__(self, position, text, fontsize = 22):
         self.position = position
         self.title = text
         self.offset = 15
@@ -190,37 +190,37 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
     screen.blit(subtitleText, titleRect)
 
     # Load a singleplayer button, draw to screen
-    singleplayereasyButton = Button((leftoffset2, topoffset),"  Play Easy CPU [F1]  ")
+    singleplayereasyButton = Button((leftoffset2, topoffset),"  Play Easy CPU [F1]  ", 20)
     if (singleplayereasyButton.getBounds().collidepoint(mousex, mousey)):
         singleplayereasyButton.highlighted(screen)
     singleplayereasyButton.draw(screen)
     
     # Load a singleplayer button, draw to screen
-    singleplayerhardButton = Button((singleplayereasyButton.getBounds().right + buttonspacing, topoffset)," Play Harder CPU [F2] ")
+    singleplayerhardButton = Button((singleplayereasyButton.getBounds().right + buttonspacing, topoffset)," Play Harder CPU [F2] ", 20)
     if (singleplayerhardButton.getBounds().collidepoint(mousex, mousey)):
         singleplayerhardButton.highlighted(screen)
     singleplayerhardButton.draw(screen)
     
     # Load a singleplayer button, draw to screen
-    singleplayerhardestButton = Button((singleplayerhardButton.getBounds().right + buttonspacing, topoffset),"Play Hardest CPU [F3]")
+    singleplayerhardestButton = Button((singleplayerhardButton.getBounds().right + buttonspacing, topoffset),"Play Hardest CPU [F3]", 20)
     if (singleplayerhardestButton.getBounds().collidepoint(mousex, mousey)):
         singleplayerhardestButton.highlighted(screen)
     singleplayerhardestButton.draw(screen)
 
     # Load a multiplayer button, draw to screen
-    multiplayerButton = Button((leftoffset, topoffset2)," Play Multiplayer [F4] ")
+    multiplayerButton = Button((leftoffset, topoffset2)," Play Multiplayer [F4] ", 20)
     if (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
         multiplayerButton.highlighted(screen)
     multiplayerButton.draw(screen)
     
     # Load a soundOnOff button, draw to screen
-    soundButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset2)," Sound On/Off [F6] ")
+    soundButton = Button((multiplayerButton.getBounds().right + buttonspacing, topoffset2)," Sound On/Off [F6] ", 20)
     if (soundButton.getBounds().collidepoint(mousex, mousey)):
         soundButton.highlighted(screen)
     soundButton.draw(screen)
     
     # Load a quit button, draw to screen
-    quitButton = Button((soundButton.getBounds().right + buttonspacing, topoffset2),"  Quit Game [F12]  ")
+    quitButton = Button((soundButton.getBounds().right + buttonspacing, topoffset2),"  Quit Game [F12]  ", 20)
     if (quitButton.getBounds().collidepoint(mousex, mousey)):
         quitButton.highlighted(screen)
     quitButton.draw(screen)
@@ -387,7 +387,7 @@ def multi(screen, enteredip, mousex = -1, mousey = -1, mouseClicked = False):
     createserverButton.draw(screen)
 
     # Load a multiplayer button, draw to screen
-    joinserverButton = Button((createserverButton.getBounds().right + buttonspacing, topoffset),"Join Server" + " "*37)
+    joinserverButton = Button((createserverButton.getBounds().right + buttonspacing, topoffset),"Join Server" + " "*32)
     if (joinserverButton.getBounds().collidepoint(mousex, mousey)):
         joinserverButton.highlighted(screen)
     joinserverButton.draw(screen)
