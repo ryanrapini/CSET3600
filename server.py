@@ -25,7 +25,7 @@ class Server(threading.Thread):
 
 
 	def listen(self):
-		for x in range (0,10):
+		for x in range (0,2):
 			self.s.listen(2)
 			print('Listening for connection...')	
 
@@ -42,21 +42,23 @@ class Server(threading.Thread):
 
 
 def clientthread(conn, status, turn):
-	conn.send("{0}.{1}".format(status, turn).encode()) #send only takes string
+	ePreamble = "{0}.{1}".format(status, turn).encode()
+	conn.send(ePreamble) #send only takes string
+	ePreambleRecv = conn.recv(1024)
 
-	# keep thread alive with infinite loop
-	while True:
-		#Receiving from client
-		pData = conn.recv(1024)
-		if not pData: break
-		data = pickle.loads(pData)
-		conn.sendall(pData)
+	if (ePreamble == ePreambleRecv):
+		print ("Preamble OK")
+
+	# # keep thread alive with infinite loop
+	# while True:
+	# 	#Receiving from client
+	# 	pData = conn.recv(1024)
+	# 	if not pData: break
+	# 	data = pickle.loads(pData)
+	# 	conn.sendall(pData)
 	conn.close()
 
-
-
-
 serv = Server()
-t = Thread(target=serv.listen, args=())
-t.start()
+servthread = Thread(target=serv.listen, args=())
+servthread.start()
 print ("lol")
