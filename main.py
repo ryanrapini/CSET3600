@@ -2,6 +2,8 @@ import sys, pygame, os, random, textrect, socket, pygame.mixer
 from pygame.locals import *
 from board import *
 from AI import *
+from server import *
+from client import *
 
 
 color = {
@@ -55,7 +57,6 @@ def getIP():
     Once connection has been established, multiplayer games can be played.
 
     """
-    
     # Create a dummy socket to report local IP address
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(('google.com', 0))
@@ -397,19 +398,19 @@ def multi(screen, enteredip, mousex = -1, mousey = -1, mouseClicked = False):
         menuButton.highlighted(screen)
     menuButton.draw(screen)
     
-    gamemode = 0
+    option = 0
 
     textbox(screen, (joinserverButton.getBounds().centerx-25,topoffset),enteredip)
     
     if (mouseClicked):
         if (createserverButton.getBounds().collidepoint(mousex, mousey)):
-            gamemode = 1
+            option = 1
         elif (joinserverButton.getBounds().collidepoint(mousex, mousey)):
-            gamemode = 2
+            option = 2
         elif (menuButton.getBounds().collidepoint(mousex, mousey)):
-            gamemode = 3
+            option = 3
 
-    return gamemode
+    return option
 
 
 def drawboards(attackboard, playerboard, screen, xm1, xm2):
@@ -750,7 +751,16 @@ def main(argv):
 
         # If we're in gamemode 2, show the multiplayer screen
         if (gamemode == 2):
-            multi(screen, "".join(enteredip), mousex, mousey, mouseClicked)
+            option = multi(screen, "".join(enteredip), mousex, mousey, mouseClicked)
+
+            if (option == 1):
+                print("lol")
+
+            elif (option == 2):
+                pass
+
+            elif (option == 3):
+                pass
 
         # If we're in gamemode 3, we're quitting
         if (gamemode == 3):
