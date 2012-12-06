@@ -87,6 +87,15 @@ def clientthread(conn, status, turn, array):
 	if (pDataRecv == pDataRecv):
 		print ("Data OK")
 
+	pMoveRecv = conn.recv(1024)
+
+	if pMoveRecv.decode() == '':
+		# No move to submit, just close connection and return
+		print ("Client quit without submitting a move.")
+		conn.close()
+		return
+
+	print("|{0}|".format(pMoveRecv))
 	# # keep thread alive with infinite loop
 	# while True:
 	# 	#Receiving from client

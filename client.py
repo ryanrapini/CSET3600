@@ -3,7 +3,7 @@ import socket
 import pickle
 import pprint
 
-HOST = 'ryanrapini.com'    # The remote host
+HOST = socket.gethostname()    # The remote host
 PORT = 58008              # The same port as used by the server
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
