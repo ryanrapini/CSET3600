@@ -37,7 +37,7 @@ from threading import Thread
 
 class Server(threading.Thread):
 	def __init__(self):
-		self.array = self.gameboard = [[0 for i in range(10)] for j in range(10)]
+		self.gameboard = [[0 for i in range(10)] for j in range(10)]
 		self.HOST = socket.gethostname()
 		self.PORT = 58008
 		self.status = 1
@@ -63,7 +63,7 @@ class Server(threading.Thread):
 			self.conn, addr = self.s.accept()
 			print('Connected by', addr)
 			
-			t = Thread(target=clientthread, args=(self.conn,self.status,self.turn,self.array))
+			t = Thread(target=clientthread, args=(self.conn,self.status,self.turn,self.gameboard))
 			t.start()
 		self.stop()
 
@@ -71,15 +71,15 @@ class Server(threading.Thread):
 		self.s.close()
 
 
-def clientthread(conn, status, turn, array):
+def clientthread(conn, status, turn, gameboard):
 	ePreamble = "{0}.{1}".format(status, turn).encode()
-	conn.send(ePreamble) #send only takes string
+	conn.send(ePreamble)
 	ePreambleRecv = conn.recv(1024)
 
 	if (ePreamble == ePreambleRecv):
 		print ("Preamble OK")
 
-	pData = pickle.dumps(array)
+	pData = pickle.dumps(gameboard)
 	print("Sending data...")
 	conn.send(pData)
 	pDataRecv = conn.recv(1024)
@@ -89,23 +89,20 @@ def clientthread(conn, status, turn, array):
 
 	pMoveRecv = conn.recv(1024)
 
-	if pMoveRecv.decode() == '':
-		# No move to submit, just close connection and return
-		print ("Client quit without submitting a move.")
-		conn.close()
-		return
-
 	print("|{0}|".format(pMoveRecv))
-	# # keep thread alive with infinite loop
-	# while True:
-	# 	#Receiving from client
-	# 	pData = conn.recv(1024)
-	# 	if not pData: break
-	# 	data = pickle.loads(pData)
-	# 	conn.sendall(pData)
+
+	try:
+		lolcats = pickle.loads(pMoveRecv)
+	except:
+		if pMoveRecv.decode() == '':
+			# No move to submit, just close connection and return
+			print ("Client quit without submitting a move.")
+			conn.close()
+			return
+
+	print("|{0}|".format(lolcats))
 	conn.close()
 
 serv = Server()
 servthread = Thread(target=serv.listen, args=())
 servthread.start()
-print ("lol")

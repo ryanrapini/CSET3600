@@ -6,9 +6,7 @@ import pprint
 HOST = socket.gethostname()    # The remote host
 PORT = 58008              # The same port as used by the server
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((HOST, PORT))
-
+gameboard = [[0 for i in range(10)] for j in range(10)]
 
 def get_preamble(s):
 	print ('Getting preamble...')
@@ -30,25 +28,24 @@ def get_board(s):
 
 
 def send_board(s):
-	pass
+	pBoard = pickle.dumps(gameboard)
+	s.send(pBoard)
+	pResponse = s.recv(1024)
+	if (pResponse == pBoard):
+		return True
+	else:
+		return False
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((HOST, PORT))
 
 preamble = get_preamble(s)
 board = get_board(s)
 
+if send_board(s):
+	print ("Move submitted!")
+
 pp = pprint.PrettyPrinter(indent=4)
 pp.pprint (board)
-
-#s.send("{0}.{1}".format(status, turn).encode()) #send only takes string
-
-# print (preamble.decode())
-
-# pData = s.recv(1024)
-# print ("Data recieved!")
-# data = pickle.loads(pData)
-# print (repr(data))
-
-
-
-
 
 s.close()
