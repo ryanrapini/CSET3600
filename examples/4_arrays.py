@@ -14,3 +14,6 @@ pp.pprint(array)
 # or even more elegantly with list comprehensions!
 array = [[0 for i in range(10)] for j in range(10)]
 pp.pprint(array)
+
+for row in array:
+	print(" ".join(str(item) for item in row))

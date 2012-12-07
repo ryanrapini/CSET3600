@@ -539,6 +539,14 @@ def multiplayer_game(ip):
 	s.close()
 
 
+def log_move(message, board):
+	f = open('logfile.txt','a', encoding='utf8')
+	f.write('{}\n'.format(message))
+	for row in board:
+		f.write(" ".join(str(item) for item in row))
+	f.close()
+
+
 def main(argv):
 	"""The main arguments occur.
 
@@ -726,14 +734,8 @@ def main(argv):
 								blah = 0
 							else:
 								playerattackboard.setpiece(temp,boxx,boxy)
-								f = open('logfile.txt','a', encoding='utf8')
-								f.write('{}'.format('Player Move'))
-								f.write('\n')
-								for a in range(BOARDWIDTH):
-									for b in range(BOARDHEIGHT):
-										f.write('{}'.format(playerattackboard.returnpiece(b,a)))
-									f.write('\n')
-								f.close()
+								log_move('Player Move', playerattackboard.returnboard())
+								
 								if (temp == 7):
 									printstatus(screen, 'Miss')
 									miss.play(loops = 0)
@@ -749,39 +751,21 @@ def main(argv):
 					elif (turn == 1):
 						if (gamedifficulty == 0):
 							comp.attack(playerboard, cpuattackboard)
-							f = open('logfile.txt','a', encoding='utf8')
-							f.write('{}'.format('Easy CPU Move'))
-							f.write('\n')
-							for a in range(BOARDWIDTH):
-								for b in range(BOARDHEIGHT):
-									f.write('{}'.format(cpuattackboard.returnpiece(b,a)))
-								f.write('\n')
-							f.close()
+							log_move('Easy CPU Move', cpuattackboard.returnboard())
+
 						elif (gamedifficulty == 1):
 							comp.attack2(playerboard, cpuattackboard)
-							f = open('logfile.txt','a', encoding='utf8')
-							f.write('{}'.format('Harder CPU Move'))
-							f.write('\n')
-							for a in range(BOARDWIDTH):
-								for b in range(BOARDHEIGHT):
-									f.write('{}'.format(cpuattackboard.returnpiece(b,a)))
-								f.write('\n')
-							f.close()
+							log_move('Harder CPU Move', cpuattackboard.returnboard())
+
 						elif (gamedifficulty == 2):
 							comp.attack3(playerboard, cpuattackboard)
-							f = open('logfile.txt','a', encoding='utf8')
-							f.write('{}'.format('Hardest CPU Move'))
-							f.write('\n')
-							for a in range(BOARDWIDTH):
-								for b in range(BOARDHEIGHT):
-									f.write('{}'.format(cpuattackboard.returnpiece(b,a)))
-								f.write('\n')
-							f.close()
+							log_move('Hardest CPU Move', cpuattackboard.returnpiece(b,a))
+
 						if (checkforwin(cpuattackboard)):
 							printstatus(screen, 'Computer Wins!')
 							turn = -1
 						else:
-							turn = 0        
+							turn = 0  
 
 		# If we're in gamemode 2, show the multiplayer screen
 		if (gamemode == 2):
@@ -799,7 +783,8 @@ def main(argv):
 
 			elif (option == 3):
 				gamemode = 0
-		if (gamemode == 3)
+
+		if (gamemode == 3):
 			if gamestarted:
 				print ("Starting a new game")
 				single(screen)
@@ -880,14 +865,8 @@ def main(argv):
 								blah = 0
 							else:
 								playerattackboard.setpiece(temp,boxx,boxy)
-								f = open('logfile.txt','a', encoding='utf8')
-								f.write('{}'.format('Player Move'))
-								f.write('\n')
-								for a in range(BOARDWIDTH):
-									for b in range(BOARDHEIGHT):
-										f.write('{}'.format(playerattackboard.returnpiece(b,a)))
-									f.write('\n')
-								f.close()
+								log_move('Player Move', playerattackboard.returnboard())
+
 								if (temp == 7):
 									printstatus(screen, 'Miss')
 									miss.play(loops = 0)
@@ -903,34 +882,16 @@ def main(argv):
 					elif (turn == 1):
 						if (gamedifficulty == 0):
 							comp.attack(playerboard, cpuattackboard)
-							f = open('logfile.txt','a', encoding='utf8')
-							f.write('{}'.format('Easy CPU Move'))
-							f.write('\n')
-							for a in range(BOARDWIDTH):
-								for b in range(BOARDHEIGHT):
-									f.write('{}'.format(cpuattackboard.returnpiece(b,a)))
-								f.write('\n')
-							f.close()
+							log_move('Easy CPU Move', cpuattackboard.returnboard())
+
 						elif (gamedifficulty == 1):
 							comp.attack2(playerboard, cpuattackboard)
-							f = open('logfile.txt','a', encoding='utf8')
-							f.write('{}'.format('Harder CPU Move'))
-							f.write('\n')
-							for a in range(BOARDWIDTH):
-								for b in range(BOARDHEIGHT):
-									f.write('{}'.format(cpuattackboard.returnpiece(b,a)))
-								f.write('\n')
-							f.close()
+							log_move('Harder CPU Move', cpuattackboard.returnboard())
+
 						elif (gamedifficulty == 2):
 							comp.attack3(playerboard, cpuattackboard)
-							f = open('logfile.txt','a', encoding='utf8')
-							f.write('{}'.format('Hardest CPU Move'))
-							f.write('\n')
-							for a in range(BOARDWIDTH):
-								for b in range(BOARDHEIGHT):
-									f.write('{}'.format(cpuattackboard.returnpiece(b,a)))
-								f.write('\n')
-							f.close()
+							log_move('Hardest CPU Move', cpuattackboard.returnpiece(b,a))
+
 						if (checkforwin(cpuattackboard)):
 							printstatus(screen, 'Computer Wins!')
 							turn = -1
