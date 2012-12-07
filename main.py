@@ -565,7 +565,7 @@ def log_message(message, board=None):
 		f.write('{}\n'.format(message))
 		f.close()
 	else:
-		f = open(filename, 'w')
+		f = open('logfile.txt', 'w')
 		f.close()
 
 
@@ -756,7 +756,7 @@ def main(argv):
 							blah = 0
 						else:
 							playerattackboard.setpiece(temp,boxx,boxy)
-							log_move('Player Move', playerattackboard.returnboard())
+							log_message('Player Move', playerattackboard.returnboard())
 							
 							if (temp == 7):
 								printstatus(screen, 'Miss')
@@ -773,15 +773,15 @@ def main(argv):
 				elif (turn == 1):
 					if (gamedifficulty == 0):
 						comp.attack(playerboard, cpuattackboard)
-						log_move('Easy CPU Move', cpuattackboard.returnboard())
+						log_message('Easy CPU Move', cpuattackboard.returnboard())
 
 					elif (gamedifficulty == 1):
 						comp.attack2(playerboard, cpuattackboard)
-						log_move('Harder CPU Move', cpuattackboard.returnboard())
+						log_message('Harder CPU Move', cpuattackboard.returnboard())
 
 					elif (gamedifficulty == 2):
 						comp.attack3(playerboard, cpuattackboard)
-						log_move('Hardest CPU Move', cpuattackboard.returnpiece(b,a))
+						log_message('Hardest CPU Move', cpuattackboard.returnpiece(b,a))
 
 					if (checkforwin(cpuattackboard)):
 						printstatus(screen, 'Computer Wins!')
@@ -892,7 +892,7 @@ def main(argv):
 							blah = 0
 						else:
 							playerattackboard.setpiece(temp,boxx,boxy)
-							log_move('Player Move', playerattackboard.returnboard())
+							log_message('Player Move', playerattackboard.returnboard())
 
 							if (temp == 7):
 								printstatus(screen, 'Miss')
@@ -909,15 +909,15 @@ def main(argv):
 				elif (turn == 1):
 					if (gamedifficulty == 0):
 						comp.attack(playerboard, enemyattackboard)
-						log_move('Easy enemy Move', enemyattackboard.returnboard())
+						log_message('Easy enemy Move', enemyattackboard.returnboard())
 
 					elif (gamedifficulty == 1):
 						comp.attack2(playerboard, enemyattackboard)
-						log_move('Harder enemy Move', enemyattackboard.returnboard())
+						log_message('Harder enemy Move', enemyattackboard.returnboard())
 
 					elif (gamedifficulty == 2):
 						comp.attack3(playerboard, enemyattackboard)
-						log_move('Hardest enemy Move', enemyattackboard.returnpiece(b,a))
+						log_message('Hardest enemy Move', enemyattackboard.returnpiece(b,a))
 
 					if (checkforwin(attackboard)):
 						printstatus(screen, 'Computer Wins!')
