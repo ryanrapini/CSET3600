@@ -63,7 +63,7 @@ class Server(threading.Thread):
 
 
 	def listen(self):
-		debug = True
+		debug = False
 		q = queue.Queue()
 
 		x = True
