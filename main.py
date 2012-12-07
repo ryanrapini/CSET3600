@@ -789,7 +789,6 @@ def main(argv):
 			if (gamestarted == 0):
 				print ("Starting a new game")
 				single(screen)
-				gamestarted = 0
 				place = 0
 				spacetaken = 0
 				turn = 0
@@ -944,7 +943,6 @@ def main(argv):
 			if (gamestarted == 0):
 				print ("Starting a new game")
 				single(screen)
-				gamestarted = 0
 				place = 0
 				spacetaken = 0
 				turn = 0
