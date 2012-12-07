@@ -37,7 +37,7 @@ from threading import Thread
 
 class Server(threading.Thread):
 	def __init__(self):
-		self.gameboard = [[0 for i in range(10)] for j in range(10)]
+		self.gameboards = [[[0 for i in range(10)] for j in range(10)] for k in range (4)]
 		self.HOST = socket.gethostname()
 		self.PORT = 58008
 		self.status = 1
@@ -66,7 +66,7 @@ class Server(threading.Thread):
 			self.conn, addr = self.s.accept()
 			print('Connected by', addr)
 			
-			t = Thread(target=clientthread, args=(self.conn,self.status,self.turn,self.gameboard))
+			t = Thread(target=clientthread, args=(self.conn,self.status,self.turn,self.gameboards))
 			t.start()
 		self.stop()
 
@@ -74,7 +74,7 @@ class Server(threading.Thread):
 		self.s.close()
 
 
-def clientthread(conn, status, turn, gameboard):
+def clientthread(conn, status, turn, gameboards):
 	ePreamble = "{0}.{1}".format(status, turn).encode()
 	conn.send(ePreamble)
 	ePreambleRecv = conn.recv(1024)
@@ -82,13 +82,14 @@ def clientthread(conn, status, turn, gameboard):
 	if (ePreamble == ePreambleRecv):
 		print ("Preamble OK")
 
-	pData = pickle.dumps(gameboard)
-	print("Sending data...")
-	conn.send(pData)
-	pDataRecv = conn.recv(1024)
+	for board in gameboards:
+		pData = pickle.dumps(board)
+		print("Sending data...")
+		conn.send(pData)
+		pDataRecv = conn.recv(1024)
 
-	if (pDataRecv == pDataRecv):
-		print ("Data OK")
+		if (pDataRecv == pDataRecv):
+			print ("Board OK")
 
 	pMoveRecv = conn.recv(1024)
 

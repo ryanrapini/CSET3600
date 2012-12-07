@@ -3,10 +3,17 @@ import socket
 import pickle
 import pprint
 
-HOST = socket.gethostname()    # The remote host
-PORT = 58008              # The same port as used by the server
 
-gameboard = [[0 for i in range(10)] for j in range(10)]
+def try_connect(ip):
+	HOST = ip    
+	PORT = 58008
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	try:
+		s.connect((HOST, PORT))
+	except:
+		return False
+	s.close()
+	return True
 
 def get_preamble(s):
 	print ('Getting preamble...')
@@ -18,13 +25,16 @@ def get_preamble(s):
 
 
 def get_board(s):
-	print ('Getting board...')
-	data = []
-	pData = s.recv(1024)
-	data += pickle.loads(pData)
-	s.send(pData)
-	print ('Recieved!')
-	return data
+	gameboards = []
+	for x in range(0,4):
+		print ('Getting board...')
+		data = []
+		pData = s.recv(1024)
+		data += pickle.loads(pData)
+		s.send(pData)
+		print ('Recieved!')
+		gameboards.append (data)
+	return gameboards
 
 
 def send_board(s):
@@ -36,8 +46,22 @@ def send_board(s):
 	else:
 		return False
 
-		
+
+def get_socket(ip):
+	HOST = ip   
+	PORT = 58008
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.connect((HOST, PORT))
+	return s
+
+
+
 if __name__ == "__main__":
+	HOST = socket.gethostname()    # The remote host
+	PORT = 58008              # The same port as used by the server
+
+	gameboard = [[0 for i in range(10)] for j in range(10)]
+
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.connect((HOST, PORT))
 
