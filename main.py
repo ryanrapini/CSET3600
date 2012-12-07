@@ -94,15 +94,21 @@ def init():
 		soundon = 1
 		print("Sound loaded sucessfully.")
 
+	#set little icon in corner
 	seticon()
+
+	#prepare clock
 	global fpsClock
 	fpsClock = pygame.time.Clock()
 
+	#setup screen size
 	size = width, height = 800, 600
 	speed = [2, 2]
-
 	screen = pygame.display.set_mode(size)
 	pygame.display.set_caption('Battleship')
+
+	# Clear our logfile
+	log_message(None)
 	
 	return screen
 
@@ -539,13 +545,28 @@ def multi_game_init(ip):
 	s.close()
 
 
-def log_move(message, board):
-	f = open('logfile.txt','a', encoding='utf8')
-	f.write('{}\n'.format(message))
-	for row in board:
-		f.write(" ".join(str(item) for item in row))
-		f.write('\n')
-	f.close()
+def log_message(message, board=None):
+	"""
+	Invocation:
+
+	If run with two arguments, print out the message, then print the array of the board
+	If run with one argument, print out that argument as a text message.
+	If the message argument is empty or none, clear the file.
+	"""
+		if board:
+			f = open('logfile.txt','a', encoding='utf8')
+			f.write('{}\n'.format(message))
+			for row in board:
+				f.write(" ".join(str(item) for item in row))
+				f.write('\n')
+			f.close()
+		elif message:
+			f = open('logfile.txt','a', encoding='utf8')
+			f.write('{}\n'.format(message))
+			f.close()
+		else:
+			f = open(filename, 'w')
+			f.close()
 
 
 def main(argv):
@@ -668,7 +689,7 @@ def main(argv):
 				comp = AI()
 				comp.placeships(shiparray, cpuboard)
 				gamestarted = True
-			
+
 			if (place == 0):
 				singleinstructions(screen, 'Please place the Aircraft Carrier on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
 			elif (place == 1):
