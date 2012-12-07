@@ -654,7 +654,7 @@ def main(argv):
 
 		# If we're in gamemode 1, show the game screen
 		if (gamemode == 1):
-			if gamestarted:
+			if not gamestarted:
 				print ("Starting a new game")
 				single(screen)
 				place = 0
@@ -785,7 +785,7 @@ def main(argv):
 				gamemode = 0
 
 		if (gamemode == 3):
-			if gamestarted:
+			if not gamestarted:
 				print ("Starting a new game")
 				single(screen)
 				place = 0
