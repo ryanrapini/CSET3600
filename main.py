@@ -507,7 +507,7 @@ def whatbox(x, y, xm):
 	return (None, None)
 
 
-def multiplayer_game(ip):
+def multi_game_init(ip):
 	if ip:
 		#We are the client
 		if try_connect(ip):
@@ -774,30 +774,35 @@ def main(argv):
 			option = multi(screen, "".join(enteredip), mousex, mousey, mouseClicked)
 
 			if (option == 1):
-				multiplayer_game(None)
+				multi_game_init(None)
 				gamemode = 3
+				playernumber = 1
 
 			elif (option == 2):
 				ip = "".join(enteredip)
-				multiplayer_game(ip)
+				multi_game_init(ip)
 				gamemode = 3
+				playernumber = 2
 
 			elif (option == 3):
 				gamemode = 0
 
 		if (gamemode == 3):
 			if not gamestarted:
-				print ("Starting a new game")
+				try:
+					playernumber
+				except NameError:
+					print ('Something went horribly wrong... I don\'t know whose turn it is!')
+					sys.exit(1)
+				print ("Starting a new multiplayer game")
 				single(screen)
 				place = 0
 				spacetaken = 0
 				turn = 0
 				playerboard = board()
 				playerattackboard = board()
-				cpuboard = board()
-				cpuattackboard = board()
-				comp = AI()
-				comp.placeships(shiparray, cpuboard)
+				enemyboard = board()
+				enemyattackboard = board()
 				gamestarted = True
 			else:
 				if (place == 0):
@@ -858,10 +863,10 @@ def main(argv):
 				boxx, boxy = whatbox(mousex, mousey, XMARGIN)
 				# game ready to play
 				if (place >= 5):
-					if (turn == 0):
+					if (turn == playernumber):
 						if (boxx != None and boxy != None) and mouseClicked:
 							place = place + 1
-							temp = cpuboard.checkforhitormiss(boxx,boxy)
+							temp = enemyboard.checkforhitormiss(boxx,boxy)
 							if (temp == 9):
 								blah = 0
 							else:
@@ -882,18 +887,18 @@ def main(argv):
 									turn = 1
 					elif (turn == 1):
 						if (gamedifficulty == 0):
-							comp.attack(playerboard, cpuattackboard)
-							log_move('Easy CPU Move', cpuattackboard.returnboard())
+							comp.attack(playerboard, enemyattackboard)
+							log_move('Easy enemy Move', enemyattackboard.returnboard())
 
 						elif (gamedifficulty == 1):
-							comp.attack2(playerboard, cpuattackboard)
-							log_move('Harder CPU Move', cpuattackboard.returnboard())
+							comp.attack2(playerboard, enemyattackboard)
+							log_move('Harder enemy Move', enemyattackboard.returnboard())
 
 						elif (gamedifficulty == 2):
-							comp.attack3(playerboard, cpuattackboard)
-							log_move('Hardest CPU Move', cpuattackboard.returnpiece(b,a))
+							comp.attack3(playerboard, enemyattackboard)
+							log_move('Hardest enemy Move', enemyattackboard.returnpiece(b,a))
 
-						if (checkforwin(cpuattackboard)):
+						if (checkforwin(attackboard)):
 							printstatus(screen, 'Computer Wins!')
 							turn = -1
 						else:
