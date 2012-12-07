@@ -63,10 +63,12 @@ class Server(threading.Thread):
 
 
 	def listen(self):
-		debug = False
+		debug = True
 		q = queue.Queue()
 
-		for x in range (0,5000):
+		x = True
+
+		while x:
 			self.preamble = (self.status, self.turn)
 			self.s.listen(2)
 			if debug: print('Listening for connection...')	
@@ -78,6 +80,12 @@ class Server(threading.Thread):
 			t = Thread(target=clientthread, args=(self.conn,self.preamble,self.gameboards, q))
 			t.start()
 			sent_move = q.get()
+			if debug: print ("queue", q.qsize())
+
+			while q.qsize() > 1:
+				if sent_move: break
+				sent_move = q.get()
+
 			if sent_move:
 				if not self.client1_submit:
 					self.gameboards = sent_move
@@ -100,6 +108,7 @@ class Server(threading.Thread):
 						self.gameboards[3] = sent_move[1]
 						self.gameboards[1] = sent_move[2]
 						self.turn = 1
+
 
 		self.stop()
 
@@ -152,7 +161,6 @@ def clientthread(conn, preamble, gameboards,q):
 				print ("Client quit without submitting a move.")
 		else:
 			print("Invalid submit?")
-
 	conn.close()
 	q.put(submitted)
 

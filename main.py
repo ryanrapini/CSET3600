@@ -444,12 +444,51 @@ def drawboards(attackboard, playerboard, screen, xm1, xm2):
 				pygame.draw.rect(screen, MISSCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
 			elif (attackboard.returnpiece(x,y) == 2) or (attackboard.returnpiece(x,y) == 3) or (attackboard.returnpiece(x,y) == 4) or (attackboard.returnpiece(x,y) == 5) or (attackboard.returnpiece(x,y) == 6):
 				pygame.draw.rect(screen, HITCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
+
 			if (playerboard.returnpiece(x,y) == 0):
 				pygame.draw.rect(screen, BLANKCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
 			elif (playerboard.returnpiece(x,y) == 1):
 				pygame.draw.rect(screen, MISSCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
 			elif (playerboard.returnpiece(x,y) == 2) or (playerboard.returnpiece(x,y) == 3) or (playerboard.returnpiece(x,y) == 4) or (playerboard.returnpiece(x,y) == 5) or (playerboard.returnpiece(x,y) == 6):
 				pygame.draw.rect(screen, SHIPCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+			elif (playerboard.returnpiece(x,y) == 7):
+				pygame.draw.rect(screen, MISSCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+			elif (playerboard.returnpiece(x,y) == 8):
+				pygame.draw.rect(screen, HITCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+
+def drawboards_multi(attackboard, playerboard, screen, xm1, xm2):
+	"""Drawing of the attckboard player board, and screen are defined.
+
+	Colors are given to the spaces of where the ship is placed(green), hit(red), and where misses occur(blue.)
+	Once a box on the player or attack board has been clicked, a loop is used to determine
+	if the box clicked was a placed shit, hit, or miss.
+
+	"""
+	BLANKCOLOR = color['black']
+	HITCOLOR = color['red']
+	MISSCOLOR = color['blue']
+	SHIPCOLOR = color['green']
+	for x in range(BOARDWIDTH):
+		for y in range(BOARDHEIGHT):
+			left1, top1 = whereisbox(x, y, xm1)
+			left2, top2 = whereisbox(x, y, xm2)
+			if (attackboard.returnpiece(x,y) == 0):
+				pygame.draw.rect(screen, BLANKCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
+			elif (attackboard.returnpiece(x,y) == 1):
+				pygame.draw.rect(screen, MISSCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
+			elif (attackboard.returnpiece(x,y) == 7):
+				pygame.draw.rect(screen, MISSCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
+			elif (attackboard.returnpiece(x,y) > 1 and attackboard.returnpiece(x,y) < 7):
+				pygame.draw.rect(screen, HITCOLOR, (left1, top1, BOXSIZE, BOXSIZE))
+			elif (attackboard.returnpiece(x,y) == 8):
+				pygame.draw.rect(screen, HITCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+
+			if (playerboard.returnpiece(x,y) == 0):
+				pygame.draw.rect(screen, BLANKCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+			elif (playerboard.returnpiece(x,y) == 1):
+				pygame.draw.rect(screen, MISSCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+			elif (playerboard.returnpiece(x,y) > 1 and playerboard.returnpiece(x,y) < 7):
+				pygame.draw.rect(screen, BLANKCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
 			elif (playerboard.returnpiece(x,y) == 7):
 				pygame.draw.rect(screen, MISSCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
 			elif (playerboard.returnpiece(x,y) == 8):
@@ -888,7 +927,6 @@ def main(argv):
 			if (place > 6):
 				if (turn == playernumber):
 					singleinstructions(screen, 'Please select spot on attack board to start game', '', 475, 500)
-					drawboards(playerattackboard, enemyattackboard, screen, XMARGIN, XMARGIN2)
 					if (boxx != None and boxy != None) and mouseClicked:
 						place = place + 1
 						for item in gameboards:
@@ -930,7 +968,7 @@ def main(argv):
 						enemyboard.setboard(boards[0])
 						enemyattackboard.setboard(boards[1])
 
-				drawboards(playerattackboard, enemyattackboard, screen, XMARGIN, XMARGIN2)
+				drawboards_multi(playerattackboard, enemyattackboard, screen, XMARGIN, XMARGIN2)
 
 			if (place == 6):
 			# waiting for server to signal game is started
