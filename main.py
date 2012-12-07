@@ -243,7 +243,7 @@ def title(screen, mousex = -1, mousey = -1, mouseClicked = False):
 		elif (multiplayerButton.getBounds().collidepoint(mousex, mousey)):
 			gamemode = 2
 		elif (quitButton.getBounds().collidepoint(mousex, mousey)):
-			gamemode = 3
+			gamemode = 4
 		elif (soundButton.getBounds().collidepoint(mousex, mousey)):
 			if (soundon == 1):
 				pygame.mixer.pause()
@@ -524,15 +524,17 @@ def multiplayer_game(ip):
 		servthread.start()
 
 	s = get_socket(ip)
-
 	preamble = get_preamble(s)
-	board = get_board(s)
 
-	# if send_board(s,gameboard):
-	# 	print ("Move submitted!")
+	print (preamble)
 
-	pp = pprint.PrettyPrinter(indent=4)
-	pp.pprint (board)
+	# board = get_board(s)
+
+	# # if send_board(s,gameboard):
+	# # 	print ("Move submitted!")
+
+	# pp = pprint.PrettyPrinter(indent=4)
+	# pp.pprint (board)
 
 	s.close()
 
@@ -718,7 +720,7 @@ def main(argv):
 			pressed = pygame.key.get_pressed()
 			# If the user clicks the x at the top of the window
 			if event.type == pygame.QUIT: 
-				gamemode = 3
+				gamemode = 4
 
 			# If the user presses F1
 			elif pressed[pygame.K_F1]:
@@ -756,7 +758,7 @@ def main(argv):
 				
 			#If the user presses F12
 			elif pressed[pygame.K_F12]:
-				gamemode = 3
+				gamemode = 4
 
 			# If the mouse is moved, record the current coordinates
 			elif event.type == MOUSEMOTION:
@@ -929,16 +931,156 @@ def main(argv):
 
 			if (option == 1):
 				multiplayer_game(None)
+				gamemode = 3
 
 			elif (option == 2):
 				ip = "".join(enteredip)
 				multiplayer_game(ip)
+				gamemode = 3
 
 			elif (option == 3):
 				gamemode = 0
+		if (gamemode == 3)
+			if (gamestarted == 0):
+				print ("Starting a new game")
+				single(screen)
+				gamestarted = 0
+				place = 0
+				spacetaken = 0
+				turn = 0
+				playerboard = board()
+				playerattackboard = board()
+				cpuboard = board()
+				cpuattackboard = board()
+				comp = AI()
+				comp.placeships(shiparray, cpuboard)
+				gamestarted = 1
+			else:
+				if (place == 0):
+					singleinstructions(screen, 'Please place the Aircraft Carrier on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+				elif (place == 1):
+					singleinstructions(screen, 'Please place the Battleship on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+				elif (place == 2):
+					singleinstructions(screen, 'Please place the Submarine on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+				elif (place == 3):
+					singleinstructions(screen, 'Please place the Destroyer on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+				elif (place == 4):
+					singleinstructions(screen, 'Please place the Patrol Boat on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+				elif (place == 5):
+					singleinstructions(screen, 'Please select spot on attack board to start game', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+				#else:
+					#singleinstructions(screen, '', '', 475, 500)
+				drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
+				boxx2, boxy2 = whatbox(mousex, mousey, XMARGIN2)
+				# user places ships on board
+				if (boxx2 != None and boxy2 != None) and mouseClicked:
+					if (place < 5):
+						checkplace = 0
+						spacepressed = pressed[pygame.K_SPACE]
+						if not (spacepressed):
+							hold = boxy2
+							if ((shiparray[place]+boxy2) < 11):
+								if (checkplace == 0):
+									for y in range(shiparray[place]): 
+										if ((playerboard.returnpiece(boxx2,hold)) != 0):
+											checkplace = 1
+										else:
+											hold = hold + 1
+								for y in range(shiparray[place]): 
+									if (checkplace == 1):
+										break
+									else:
+										playerboard.setpiece(shiparray[place],boxx2,boxy2)
+										boxy2 = boxy2 + 1
+										if (y == (shiparray[place]-1)):
+											place = place + 1
+						elif (spacepressed):
+							hold = boxx2
+							if ((shiparray[place]+boxx2) < 11):
+								if (checkplace == 0):
+									for x in range(shiparray[place]): 
+										if ((playerboard.returnpiece(hold,boxy2)) != 0):
+											checkplace = 1
+										else:
+											hold = hold + 1
+								for x in range(shiparray[place]): 
+									if (checkplace == 1):
+										break
+									else:
+										playerboard.setpiece(shiparray[place],boxx2,boxy2)
+										boxx2 = boxx2 + 1
+										if (x == (shiparray[place]-1)):
+											place = place + 1
+				boxx, boxy = whatbox(mousex, mousey, XMARGIN)
+				# game ready to play
+				if (place >= 5):
+					if (turn == 0):
+						if (boxx != None and boxy != None) and mouseClicked:
+							place = place + 1
+							temp = cpuboard.checkforhitormiss(boxx,boxy)
+							if (temp == 9):
+								blah = 0
+							else:
+								playerattackboard.setpiece(temp,boxx,boxy)
+								f = open('logfile.txt','a', encoding='utf8')
+								f.write('{}'.format('Player Move'))
+								f.write('\n')
+								for a in range(BOARDWIDTH):
+									for b in range(BOARDHEIGHT):
+										f.write('{}'.format(playerattackboard.returnpiece(b,a)))
+									f.write('\n')
+								f.close()
+								if (temp == 7):
+									printstatus(screen, 'Miss')
+									miss.play(loops = 0)
+								else:
+									printstatus(screen, 'Hit')
+									hit.play(loops = 0)
+								if (checkforwin(playerattackboard)):
+									printstatus(screen, 'You win!')
+									turn = -1
+								else:
+									checkforshipsunk(playerattackboard, temp, screen)
+									turn = 1
+					elif (turn == 1):
+						if (gamedifficulty == 0):
+							comp.attack(playerboard, cpuattackboard)
+							f = open('logfile.txt','a', encoding='utf8')
+							f.write('{}'.format('Easy CPU Move'))
+							f.write('\n')
+							for a in range(BOARDWIDTH):
+								for b in range(BOARDHEIGHT):
+									f.write('{}'.format(cpuattackboard.returnpiece(b,a)))
+								f.write('\n')
+							f.close()
+						elif (gamedifficulty == 1):
+							comp.attack2(playerboard, cpuattackboard)
+							f = open('logfile.txt','a', encoding='utf8')
+							f.write('{}'.format('Harder CPU Move'))
+							f.write('\n')
+							for a in range(BOARDWIDTH):
+								for b in range(BOARDHEIGHT):
+									f.write('{}'.format(cpuattackboard.returnpiece(b,a)))
+								f.write('\n')
+							f.close()
+						elif (gamedifficulty == 2):
+							comp.attack3(playerboard, cpuattackboard)
+							f = open('logfile.txt','a', encoding='utf8')
+							f.write('{}'.format('Hardest CPU Move'))
+							f.write('\n')
+							for a in range(BOARDWIDTH):
+								for b in range(BOARDHEIGHT):
+									f.write('{}'.format(cpuattackboard.returnpiece(b,a)))
+								f.write('\n')
+							f.close()
+						if (checkforwin(cpuattackboard)):
+							printstatus(screen, 'Computer Wins!')
+							turn = -1
+						else:
+							turn = 0  
 
 		# If we're in gamemode 3, we're quitting
-		if (gamemode == 3):
+		if (gamemode == 4):
 			screen.fill(color['black'])
 			font = pygame.font.Font('resources/alphbeta.ttf', 70)
 			thanks = font.render("Thanks for playing!", False, color['white'])
