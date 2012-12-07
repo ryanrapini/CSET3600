@@ -1,13 +1,13 @@
 class board(object):
 	
 	def __init__(self):
-			self.gameboard = [[0 for i in range(10)] for j in range(10)]
+		self.gameboard = [[0 for i in range(10)] for j in range(10)]
 			
 	def setpiece(self, piece, row, col):
-			self.gameboard[col][row] = piece
+		self.gameboard[col][row] = piece
 			
 	def returnpiece(self, row, col):
-			return self.gameboard[col][row]
+		return self.gameboard[col][row]
 		
 	def checkforhitormiss(self, row, col):
 		hold = self.returnpiece(row, col)
@@ -23,4 +23,7 @@ class board(object):
 		
 	def returnboard(self):
 		return self.gameboard
+
+	def setboard(self, board):
+		self.gameboard = board
 				

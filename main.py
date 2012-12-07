@@ -527,7 +527,7 @@ def multi_game_init(ip):
 		# We are the server
 		# Spawn a server process, leave it alone.
 		print ("Starting Server...")
-		ip = socket.gethostname()
+		ip = getIP()
 		serv = Server()
 		servthread = Thread(target=serv.listen, args=())
 		servthread.start()
@@ -590,7 +590,7 @@ def main(argv):
 	music.play(loops = -1) 
 
 	#get current hostname
-	enteredip = list('192.168.1.107')
+	enteredip = list(getIP())
 	while 1:
 		mouseClicked = False
 		for event in pygame.event.get():
@@ -783,6 +783,7 @@ def main(argv):
 
 			if (option == 1):
 				multi_game_init(None)
+				ip = getIP()
 				gamemode = 3
 				playernumber = 1
 
@@ -800,12 +801,12 @@ def main(argv):
 			s = get_socket(ip)
 			preamble = get_preamble(s)
 			status, turn = preamble.split('.')
+			status = int(status)
+			turn = int(turn)
 			boards = get_boards(s)
 
-			print (status, turn)
-
-			if (status == 2):
-				break
+			if (status == 0):
+				gamemode = 0
 
 			if not gamestarted:
 				try:
@@ -835,35 +836,17 @@ def main(argv):
 				singleinstructions(screen, 'Please place the Destroyer on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
 			elif (place == 4):
 				singleinstructions(screen, 'Please place the Patrol Boat on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
-			elif (place == 5):
-				singleinstructions(screen, 'Please select spot on attack board to start game', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
 
-			drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
+			
 			boxx, boxy = whatbox(mousex, mousey, XMARGIN)
 			boxx2, boxy2 = whatbox(mousex, mousey, XMARGIN2)
 			# user places ships on board
 			if (place < 5):
-				if mouseClicked and boxx2 != None and boxy2 != None:
+				drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
+				if boxx2 != None and boxy2 != None and mouseClicked:
 					checkplace = 0
 					spacepressed = pressed[pygame.K_SPACE]
-					if spacepressed:
-						hold = boxx2
-						if ((shiparray[place]+boxx2) < 11):
-							if (checkplace == 0):
-								for x in range(shiparray[place]): 
-									if ((playerboard.returnpiece(hold,boxy2)) != 0):
-										checkplace = 1
-									else:
-										hold = hold + 1
-							for x in range(shiparray[place]): 
-								if (checkplace == 1):
-									break
-								else:
-									playerboard.setpiece(shiparray[place],boxx2,boxy2)
-									boxx2 = boxx2 + 1
-									if (x == (shiparray[place]-1)):
-										place = place + 1
-					else:
+					if not (spacepressed):
 						hold = boxy2
 						if ((shiparray[place]+boxy2) < 11):
 							if (checkplace == 0):
@@ -880,22 +863,35 @@ def main(argv):
 									boxy2 = boxy2 + 1
 									if (y == (shiparray[place]-1)):
 										place = place + 1
-			if (place == 5):
-				pp = pprint.PrettyPrinter(indent=4)
-				for item in gameboards:
-					pp.pprint(item)
-				send_boards(s, gameboards)
-				place += 1
-			print (place)
+					elif (spacepressed):
+						hold = boxx2
+						if ((shiparray[place]+boxx2) < 11):
+							if (checkplace == 0):
+								for x in range(shiparray[place]): 
+									if ((playerboard.returnpiece(hold,boxy2)) != 0):
+										checkplace = 1
+									else:
+										hold = hold + 1
+							for x in range(shiparray[place]): 
+								if (checkplace == 1):
+									break
+								else:
+									playerboard.setpiece(shiparray[place],boxx2,boxy2)
+									boxx2 = boxx2 + 1
+									if (x == (shiparray[place]-1)):
+										place = place + 1
+
 			# game ready to play
-			if (place > 5):
-				sys.exit()
+			if (place > 6):
 				if (turn == playernumber):
+					singleinstructions(screen, 'Please select spot on attack board to start game', '', 475, 500)
+					drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
 					if (boxx != None and boxy != None) and mouseClicked:
 						place = place + 1
+						print enemyboard.returnboard()
 						temp = enemyboard.checkforhitormiss(boxx,boxy)
 						if (temp == 9):
-							blah = 0
+							pass
 						else:
 							playerattackboard.setpiece(temp,boxx,boxy)
 							log_message('Player Move', playerattackboard.returnboard())
@@ -916,7 +912,49 @@ def main(argv):
 
 				else:
 					#waiting for other player to play, don't accept clicks
-					pass
+					singleinstructions(screen, 'Please wait for your opponent to play!', '', 475, 500)
+					if (playernumber == 1):
+						playerboard.setboard(boards[0])
+						playerattackboard.setboard(boards[1])
+						enemyboard.setboard(boards[2])
+						enemyattackboard.setboard(boards[3])
+					else:
+						playerboard.setboard(boards[2])
+						playerattackboard.setboard(boards[3])
+						enemyboard.setboard(boards[0])
+						enemyattackboard.setboard(boards[1])
+
+				drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
+
+			if (place == 6):
+			# waiting for server to signal game is started
+				singleinstructions(screen, 'All Set!', 'Waiting for the other player to finish placing their ships...', 475, 500)
+				print (status)
+
+				if (status == 2):
+					if (playernumber == 1):
+						playerboard.setboard(boards[0])
+						playerattackboard.setboard(boards[1])
+						enemyboard.setboard(boards[2])
+						enemyattackboard.setboard(boards[3])
+					else:
+						playerboard.setboard(boards[2])
+						playerattackboard.setboard(boards[3])
+						enemyboard.setboard(boards[0])
+						enemyattackboard.setboard(boards[1])
+					place += 1
+
+
+			if (place == 5):
+				# pp = pprint.PrettyPrinter(indent=4)
+				# for item in gameboards:
+				# 	pp.pprint(item)
+
+				singleinstructions(screen, 'All Set!', 'Waiting for the other player to finish placing their ships...', 475, 500)
+				if (turn == playernumber):
+					print ("Player ready", playernumber)
+					send_boards(s, gameboards)
+					place += 1
 			s.close()
 
 		# If we're in gamemode 4, we're quitting

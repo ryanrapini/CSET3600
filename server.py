@@ -35,6 +35,7 @@ import sys
 import threading
 import queue
 from threading import Thread
+import pprint
 
 class Server(threading.Thread):
 	def __init__(self):
@@ -62,22 +63,49 @@ class Server(threading.Thread):
 
 
 	def listen(self):
+		debug = False
 		q = queue.Queue()
-		for x in range (0,500):
+
+		for x in range (0,5000):
 			self.preamble = (self.status, self.turn)
 			self.s.listen(2)
-			print('Listening for connection...')	
+			if debug: print('Listening for connection...')	
 
 			#wait to accept a connection - blocking call
 			self.conn, addr = self.s.accept()
-			print('Connected by', addr)
+			if debug: print('Connected by', addr)
 			
 			t = Thread(target=clientthread, args=(self.conn,self.preamble,self.gameboards, q))
 			t.start()
-			print("lol")
 			sent_move = q.get()
-			if not self.client1_submit:
-				gameboards = sent_move
+			if sent_move:
+				if not self.client1_submit:
+					gameboards = sent_move
+					self.client1_submit = True
+					self.turn = 2
+				elif not self.client2_submit:
+					gameboards[2] = sent_move[0]
+					self.client2_submit = True
+					self.turn = 1
+					self.status = 2
+					pp = pprint.PrettyPrinter(indent=4)
+					for item in gameboards:
+						pp.pprint(item)
+				else:
+					if self.turn == 1:
+						gameboards[0] = sent_move[0]
+						gameboards[1] = sent_move[1]
+						gameboards[2] = sent_move[2]
+						gameboards[3] = sent_move[3]
+						self.turn = 2
+					else:
+						gameboards[2] = sent_move[0]
+						gameboards[3] = sent_move[1]
+						gameboards[0] = sent_move[2]
+						gameboards[1] = sent_move[3]
+						self.turn = 1
+
+				
 
 		self.stop()
 
@@ -86,48 +114,53 @@ class Server(threading.Thread):
 
 
 def clientthread(conn, preamble, gameboards,q):
+	debug = False
 	status, turn = preamble
 	ePreamble = "{0}.{1}".format(status, turn).encode()
-	print (ePreamble)
-	pPreamble = pickle.dumps(preamble)
-	print("Sending preamble...")
+	if debug:
+		print("Sending preamble...")
 	conn.send(ePreamble)
-	print ("Recieving preamble.")
-	pPreambleRecv = conn.recv(1024)
-	print("done")
-	if (pPreamble == pPreambleRecv):
-		print ("Preamble OK")
+	if debug:
+		print ("Recieving preamble.")
+	ePreambleRecv = conn.recv(1024)
+	if (ePreamble == ePreambleRecv):
+		if debug:
+			print ("Preamble OK")
 
+	if debug:
+		print("Sending data...")
 	for board in gameboards:
 		pData = pickle.dumps(board)
-		print("Sending data...")
 		conn.send(pData)
 		pDataRecv = conn.recv(1024)
 
 		if (pDataRecv == pDataRecv):
-			print ("Board OK")
+			if debug:
+				print ("Board OK")
 
 	# if still in initial setup
 
 	try:
 		submitted = []
 		for x in range(0,4):
-			print ('Getting board...')
+			if debug:
+				print ('Getting board...')
 			pData = conn.recv(1024)
 			data = pickle.loads(pData)
 			conn.send(pData)
-			print ('Recieved!')
+			if debug:
+				print ('Recieved!')
 			submitted.append(data)
 	except:
 		if (submitted == []):
 			# No move to submit, just close connection and return
-			print ("Client quit without submitting a move.")
+			if debug:
+				print ("Client quit without submitting a move.")
 		else:
 			print("Invalid submit?")
 
 	conn.close()
 	q.put(submitted)
-	sys.exit()
 
 if __name__ == "__main__":
 	serv = Server()

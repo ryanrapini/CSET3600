@@ -18,37 +18,46 @@ import pprint
 # 	return True
 
 def get_preamble(s):
-	print ('Getting preamble...')
+	debug = False
+	if debug:
+		print ('Getting preamble...')
 	ePreamble = s.recv(1024)
 	preamble = ePreamble.decode()
 	s.sendall(ePreamble)
-	print ('Recieved!')
+	if debug:
+		print ('Recieved!')
 	return preamble
 
 
 def get_boards(s):
+	debug = False
 	gameboards = []
 	for x in range(0,4):
-		print ('Getting board...')
+		if debug:
+			print ('Getting board...')
 		data = []
 		pData = s.recv(1024)
 		data += pickle.loads(pData)
 		s.send(pData)
-		print ('Recieved!')
+		if debug:
+			print ('Recieved!')
 		gameboards.append (data)
 	return gameboards
 
 
 def send_boards(s, gameboards):
+	debug = False
 	try:
 		for board in gameboards:
 			pData = pickle.dumps(board)
-			print("Sending data...")
+			if debug:
+				print("Sending data...")
 			s.send(pData)
 			pDataRecv = s.recv(1024)
 
 			if (pDataRecv == pDataRecv):
-				print ("Board OK")
+				if debug:
+					print ("Board OK")
 	except:
 		return False
 	return True
