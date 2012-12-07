@@ -807,7 +807,7 @@ def main(argv):
 
 					elif (gamedifficulty == 2):
 						comp.attack3(playerboard, cpuattackboard)
-						log_message('Hardest CPU Move', cpuattackboard.returnpiece(b,a))
+						log_message('Hardest CPU Move', cpuattackboard.returnboard())
 
 					if (checkforwin(cpuattackboard)):
 						printstatus(screen, 'Computer Wins!')
