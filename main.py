@@ -4,7 +4,8 @@ from board import *
 from AI import *
 from server import *
 from client import *
-
+import pickle
+import pprint
 
 color = {
 'black' : (0, 0, 0),
@@ -513,13 +514,15 @@ def whatbox(x, y, xm):
 	return (None, None)
 
 
+
 def multi_game_init(ip):
 	if ip:
-		#We are the client
-		if try_connect(ip):
-			print ("Connected to server sucessfully")
-		else:
-			print ("No IP entered or could not connect.")
+		pass
+		# #We are the client
+		# if try_connect(ip):
+		# 	print ("Connected to server sucessfully")
+		# else:
+		# 	print ("No IP entered or could not connect.")
 	else:
 		# We are the server
 		# Spawn a server process, leave it alone.
@@ -528,21 +531,6 @@ def multi_game_init(ip):
 		serv = Server()
 		servthread = Thread(target=serv.listen, args=())
 		servthread.start()
-
-	s = get_socket(ip)
-	preamble = get_preamble(s)
-
-	print (preamble)
-
-	# board = get_board(s)
-
-	# # if send_board(s,gameboard):
-	# # 	print ("Move submitted!")
-
-	# pp = pprint.PrettyPrinter(indent=4)
-	# pp.pprint (board)
-
-	s.close()
 
 
 def log_message(message, board=None):
@@ -602,8 +590,7 @@ def main(argv):
 	music.play(loops = -1) 
 
 	#get current hostname
-	enteredip = list(socket.gethostbyname(socket.gethostname()))
-	socket.gethostbyname(socket.gethostname())
+	enteredip = list('192.168.1.107')
 	while 1:
 		mouseClicked = False
 		for event in pygame.event.get():
@@ -808,7 +795,18 @@ def main(argv):
 			elif (option == 3):
 				gamemode = 0
 
+
 		if (gamemode == 3):
+			s = get_socket(ip)
+			preamble = get_preamble(s)
+			status, turn = preamble.split('.')
+			boards = get_boards(s)
+
+			print (status, turn)
+
+			if (status == 2):
+				break
+
 			if not gamestarted:
 				try:
 					playernumber
@@ -824,8 +822,9 @@ def main(argv):
 				playerattackboard = board()
 				enemyboard = board()
 				enemyattackboard = board()
+				gameboards = [playerboard.returnboard(), playerattackboard.returnboard(), enemyboard.returnboard(), enemyattackboard.returnboard()]
 				gamestarted = True
-		
+
 			if (place == 0):
 				singleinstructions(screen, 'Please place the Aircraft Carrier on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
 			elif (place == 1):
@@ -838,33 +837,16 @@ def main(argv):
 				singleinstructions(screen, 'Please place the Patrol Boat on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
 			elif (place == 5):
 				singleinstructions(screen, 'Please select spot on attack board to start game', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
-			#else:
-				#singleinstructions(screen, '', '', 475, 500)
+
 			drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
+			boxx, boxy = whatbox(mousex, mousey, XMARGIN)
 			boxx2, boxy2 = whatbox(mousex, mousey, XMARGIN2)
 			# user places ships on board
-			if (boxx2 != None and boxy2 != None) and mouseClicked:
-				if (place < 5):
+			if (place < 5):
+				if mouseClicked and boxx2 != None and boxy2 != None:
 					checkplace = 0
 					spacepressed = pressed[pygame.K_SPACE]
-					if not (spacepressed):
-						hold = boxy2
-						if ((shiparray[place]+boxy2) < 11):
-							if (checkplace == 0):
-								for y in range(shiparray[place]): 
-									if ((playerboard.returnpiece(boxx2,hold)) != 0):
-										checkplace = 1
-									else:
-										hold = hold + 1
-							for y in range(shiparray[place]): 
-								if (checkplace == 1):
-									break
-								else:
-									playerboard.setpiece(shiparray[place],boxx2,boxy2)
-									boxy2 = boxy2 + 1
-									if (y == (shiparray[place]-1)):
-										place = place + 1
-					elif (spacepressed):
+					if spacepressed:
 						hold = boxx2
 						if ((shiparray[place]+boxx2) < 11):
 							if (checkplace == 0):
@@ -881,9 +863,33 @@ def main(argv):
 									boxx2 = boxx2 + 1
 									if (x == (shiparray[place]-1)):
 										place = place + 1
-			boxx, boxy = whatbox(mousex, mousey, XMARGIN)
+					else:
+						hold = boxy2
+						if ((shiparray[place]+boxy2) < 11):
+							if (checkplace == 0):
+								for y in range(shiparray[place]): 
+									if ((playerboard.returnpiece(boxx2,hold)) != 0):
+										checkplace = 1
+									else:
+										hold = hold + 1
+							for y in range(shiparray[place]): 
+								if (checkplace == 1):
+									break
+								else:
+									playerboard.setpiece(shiparray[place],boxx2,boxy2)
+									boxy2 = boxy2 + 1
+									if (y == (shiparray[place]-1)):
+										place = place + 1
+			if (place == 5):
+				pp = pprint.PrettyPrinter(indent=4)
+				for item in gameboards:
+					pp.pprint(item)
+				send_boards(s, gameboards)
+				place += 1
+			print (place)
 			# game ready to play
-			if (place >= 5):
+			if (place > 5):
+				sys.exit()
 				if (turn == playernumber):
 					if (boxx != None and boxy != None) and mouseClicked:
 						place = place + 1
@@ -900,32 +906,20 @@ def main(argv):
 							else:
 								printstatus(screen, 'Hit')
 								hit.play(loops = 0)
+
 							if (checkforwin(playerattackboard)):
 								printstatus(screen, 'You win!')
 								turn = -1
 							else:
 								checkforshipsunk(playerattackboard, temp, screen)
 								turn = 1
-				elif (turn == 1):
-					if (gamedifficulty == 0):
-						comp.attack(playerboard, enemyattackboard)
-						log_message('Easy enemy Move', enemyattackboard.returnboard())
 
-					elif (gamedifficulty == 1):
-						comp.attack2(playerboard, enemyattackboard)
-						log_message('Harder enemy Move', enemyattackboard.returnboard())
+				else:
+					#waiting for other player to play, don't accept clicks
+					pass
+			s.close()
 
-					elif (gamedifficulty == 2):
-						comp.attack3(playerboard, enemyattackboard)
-						log_message('Hardest enemy Move', enemyattackboard.returnpiece(b,a))
-
-					if (checkforwin(attackboard)):
-						printstatus(screen, 'Computer Wins!')
-						turn = -1
-					else:
-						turn = 0  
-
-		# If we're in gamemode 3, we're quitting
+		# If we're in gamemode 4, we're quitting
 		if (gamemode == 4):
 			screen.fill(color['black'])
 			font = pygame.font.Font('resources/alphbeta.ttf', 70)
@@ -934,12 +928,8 @@ def main(argv):
 			thanksRect.center = (400, 300)
 			screen.blit(thanks, thanksRect)
 			pygame.mixer.quit()
-
-
-
 			pygame.display.update()
 			print('Quitting :[')
-
 			pygame.time.wait(1500)
 			pygame.quit()
 			sys.exit(0)

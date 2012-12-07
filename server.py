@@ -33,15 +33,19 @@ import socket
 import pickle
 import sys
 import threading
+import queue
 from threading import Thread
 
 class Server(threading.Thread):
 	def __init__(self):
 		self.gameboards = [[[0 for i in range(10)] for j in range(10)] for k in range (4)]
-		self.HOST = socket.gethostname()
+		self.HOST = '192.168.1.107'
 		self.PORT = 58008
 		self.status = 1
 		self.turn = 1
+		self.client1_submit = False
+		self.client2_submit = False
+		self.preamble = (self.status, self.turn)
 
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		print ('Created Socket')
@@ -58,7 +62,9 @@ class Server(threading.Thread):
 
 
 	def listen(self):
-		for x in range (0,2):
+		q = queue.Queue()
+		for x in range (0,500):
+			self.preamble = (self.status, self.turn)
 			self.s.listen(2)
 			print('Listening for connection...')	
 
@@ -66,20 +72,30 @@ class Server(threading.Thread):
 			self.conn, addr = self.s.accept()
 			print('Connected by', addr)
 			
-			t = Thread(target=clientthread, args=(self.conn,self.status,self.turn,self.gameboards))
+			t = Thread(target=clientthread, args=(self.conn,self.preamble,self.gameboards, q))
 			t.start()
+			print("lol")
+			sent_move = q.get()
+			if not self.client1_submit:
+				gameboards = sent_move
+
 		self.stop()
 
 	def stop(self):
 		self.s.close()
 
 
-def clientthread(conn, status, turn, gameboards):
+def clientthread(conn, preamble, gameboards,q):
+	status, turn = preamble
 	ePreamble = "{0}.{1}".format(status, turn).encode()
+	print (ePreamble)
+	pPreamble = pickle.dumps(preamble)
+	print("Sending preamble...")
 	conn.send(ePreamble)
-	ePreambleRecv = conn.recv(1024)
-
-	if (ePreamble == ePreambleRecv):
+	print ("Recieving preamble.")
+	pPreambleRecv = conn.recv(1024)
+	print("done")
+	if (pPreamble == pPreambleRecv):
 		print ("Preamble OK")
 
 	for board in gameboards:
@@ -91,21 +107,27 @@ def clientthread(conn, status, turn, gameboards):
 		if (pDataRecv == pDataRecv):
 			print ("Board OK")
 
-	pMoveRecv = conn.recv(1024)
-
-	print("|{0}|".format(pMoveRecv))
+	# if still in initial setup
 
 	try:
-		lolcats = pickle.loads(pMoveRecv)
+		submitted = []
+		for x in range(0,4):
+			print ('Getting board...')
+			pData = conn.recv(1024)
+			data = pickle.loads(pData)
+			conn.send(pData)
+			print ('Recieved!')
+			submitted.append(data)
 	except:
-		if pMoveRecv.decode() == '':
+		if (submitted == []):
 			# No move to submit, just close connection and return
 			print ("Client quit without submitting a move.")
-			conn.close()
-			return
+		else:
+			print("Invalid submit?")
 
-	print("|{0}|".format(lolcats))
 	conn.close()
+	q.put(submitted)
+	sys.exit()
 
 if __name__ == "__main__":
 	serv = Server()

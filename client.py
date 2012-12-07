@@ -4,27 +4,29 @@ import pickle
 import pprint
 
 
-def try_connect(ip):
-	HOST = ip    
-	PORT = 58008
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	try:
-		s.connect((HOST, PORT))
-	except:
-		return False
-	s.close()
-	return True
+# def try_connect(ip):
+# 	HOST = ip    
+# 	PORT = 58008
+# 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 	try:
+# 		s.connect((HOST, PORT))
+# 		s.close()
+# 	except:
+# 		print ("oh noes")
+# 		return False
+	
+# 	return True
 
 def get_preamble(s):
 	print ('Getting preamble...')
 	ePreamble = s.recv(1024)
 	preamble = ePreamble.decode()
-	s.send(ePreamble)
+	s.sendall(ePreamble)
 	print ('Recieved!')
 	return preamble
 
 
-def get_board(s):
+def get_boards(s):
 	gameboards = []
 	for x in range(0,4):
 		print ('Getting board...')
@@ -37,19 +39,25 @@ def get_board(s):
 	return gameboards
 
 
-def send_board(s):
-	pBoard = pickle.dumps(gameboard)
-	s.send(pBoard)
-	pResponse = s.recv(1024)
-	if (pResponse == pBoard):
-		return True
-	else:
+def send_boards(s, gameboards):
+	try:
+		for board in gameboards:
+			pData = pickle.dumps(board)
+			print("Sending data...")
+			s.send(pData)
+			pDataRecv = s.recv(1024)
+
+			if (pDataRecv == pDataRecv):
+				print ("Board OK")
+	except:
 		return False
+	return True
 
 
 def get_socket(ip):
-	HOST = ip   
-	PORT = 58008
+	HOST = ip    # The remote host
+	PORT = 58008              # The same port as used by the server
+
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.connect((HOST, PORT))
 	return s
@@ -57,21 +65,24 @@ def get_socket(ip):
 
 
 if __name__ == "__main__":
-	HOST = socket.gethostname()    # The remote host
+	ip = socket.gethostbyname(socket.gethostname())
+	HOST = '192.168.1.107'   # The remote host
 	PORT = 58008              # The same port as used by the server
 
-	gameboard = [[0 for i in range(10)] for j in range(10)]
+	gameboards = [[[0 for i in range(10)] for j in range(10)] for k in range (4)]
 
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.connect((HOST, PORT))
-
+	# try_connect(ip)
+	# s = get_socket(ip)
 	preamble = get_preamble(s)
-	board = get_board(s)
+	print (preamble)
+	board = get_boards(s)
 
-	if send_board(s):
-		print ("Move submitted!")
+	# if send_boards(s, gameboards):
+	# 	print ("Move submitted!")
 
-	pp = pprint.PrettyPrinter(indent=4)
-	pp.pprint (board)
+	# pp = pprint.PrettyPrinter(indent=4)
+	# pp.pprint (board)
 
 	s.close()
