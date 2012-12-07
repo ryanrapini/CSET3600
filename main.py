@@ -544,6 +544,7 @@ def log_move(message, board):
 	f.write('{}\n'.format(message))
 	for row in board:
 		f.write(" ".join(str(item) for item in row))
+		f.write('\n')
 	f.close()
 
 
