@@ -798,6 +798,9 @@ def main(argv):
 
 
 		if (gamemode == 3):
+
+			pp = pprint.PrettyPrinter(indent=4)
+
 			s = get_socket(ip)
 			preamble = get_preamble(s)
 			status, turn = preamble.split('.')
@@ -885,10 +888,11 @@ def main(argv):
 			if (place > 6):
 				if (turn == playernumber):
 					singleinstructions(screen, 'Please select spot on attack board to start game', '', 475, 500)
-					drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
+					drawboards(playerattackboard, enemyattackboard, screen, XMARGIN, XMARGIN2)
 					if (boxx != None and boxy != None) and mouseClicked:
 						place = place + 1
-						print enemyboard.returnboard()
+						for item in gameboards:
+							pp.pprint(item)
 						temp = enemyboard.checkforhitormiss(boxx,boxy)
 						if (temp == 9):
 							pass
@@ -909,6 +913,8 @@ def main(argv):
 							else:
 								checkforshipsunk(playerattackboard, temp, screen)
 								turn = 1
+						gameboards = [playerboard.returnboard(), playerattackboard.returnboard(), enemyboard.returnboard(), enemyattackboard.returnboard()]
+						send_boards(s, gameboards)
 
 				else:
 					#waiting for other player to play, don't accept clicks
@@ -924,35 +930,36 @@ def main(argv):
 						enemyboard.setboard(boards[0])
 						enemyattackboard.setboard(boards[1])
 
-				drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
+				drawboards(playerattackboard, enemyattackboard, screen, XMARGIN, XMARGIN2)
 
 			if (place == 6):
 			# waiting for server to signal game is started
 				singleinstructions(screen, 'All Set!', 'Waiting for the other player to finish placing their ships...', 475, 500)
-				print (status)
 
 				if (status == 2):
+					s.close()
+					s = get_socket(ip)
+					preamble = get_preamble(s)
+					status, turn = preamble.split('.')
+					status = int(status)
+					turn = int(turn)
+					boards = get_boards(s)
 					if (playernumber == 1):
 						playerboard.setboard(boards[0])
-						playerattackboard.setboard(boards[1])
 						enemyboard.setboard(boards[2])
-						enemyattackboard.setboard(boards[3])
 					else:
 						playerboard.setboard(boards[2])
-						playerattackboard.setboard(boards[3])
 						enemyboard.setboard(boards[0])
-						enemyattackboard.setboard(boards[1])
 					place += 1
 
 
 			if (place == 5):
-				# pp = pprint.PrettyPrinter(indent=4)
-				# for item in gameboards:
-				# 	pp.pprint(item)
+				
 
 				singleinstructions(screen, 'All Set!', 'Waiting for the other player to finish placing their ships...', 475, 500)
 				if (turn == playernumber):
 					print ("Player ready", playernumber)
+					gameboards = [playerboard.returnboard(), playerattackboard.returnboard(), enemyboard.returnboard(), enemyattackboard.returnboard()]
 					send_boards(s, gameboards)
 					place += 1
 			s.close()

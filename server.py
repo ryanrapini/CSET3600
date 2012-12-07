@@ -80,32 +80,26 @@ class Server(threading.Thread):
 			sent_move = q.get()
 			if sent_move:
 				if not self.client1_submit:
-					gameboards = sent_move
+					self.gameboards = sent_move
 					self.client1_submit = True
 					self.turn = 2
 				elif not self.client2_submit:
-					gameboards[2] = sent_move[0]
+					self.gameboards[2] = sent_move[0]
 					self.client2_submit = True
 					self.turn = 1
 					self.status = 2
 					pp = pprint.PrettyPrinter(indent=4)
-					for item in gameboards:
+					for item in self.gameboards:
 						pp.pprint(item)
 				else:
 					if self.turn == 1:
-						gameboards[0] = sent_move[0]
-						gameboards[1] = sent_move[1]
-						gameboards[2] = sent_move[2]
-						gameboards[3] = sent_move[3]
+						self.gameboards[1] = sent_move[1]
+						self.gameboards[3] = sent_move[2]
 						self.turn = 2
 					else:
-						gameboards[2] = sent_move[0]
-						gameboards[3] = sent_move[1]
-						gameboards[0] = sent_move[2]
-						gameboards[1] = sent_move[3]
+						self.gameboards[3] = sent_move[1]
+						self.gameboards[1] = sent_move[2]
 						self.turn = 1
-
-				
 
 		self.stop()
 

@@ -35,13 +35,12 @@ def get_boards(s):
 	for x in range(0,4):
 		if debug:
 			print ('Getting board...')
-		data = []
 		pData = s.recv(1024)
-		data += pickle.loads(pData)
+		data = pickle.loads(pData)
 		s.send(pData)
 		if debug:
 			print ('Recieved!')
-		gameboards.append (data)
+		gameboards.append(data)
 	return gameboards
 
 
