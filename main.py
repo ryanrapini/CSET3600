@@ -488,7 +488,7 @@ def drawboards_multi(attackboard, playerboard, screen, xm1, xm2):
 			elif (playerboard.returnpiece(x,y) == 1):
 				pygame.draw.rect(screen, MISSCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
 			elif (playerboard.returnpiece(x,y) > 1 and playerboard.returnpiece(x,y) < 7):
-				pygame.draw.rect(screen, BLANKCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
+				pygame.draw.rect(screen, SHIPCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
 			elif (playerboard.returnpiece(x,y) == 7):
 				pygame.draw.rect(screen, MISSCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
 			elif (playerboard.returnpiece(x,y) == 8):
@@ -968,7 +968,7 @@ def main(argv):
 						enemyboard.setboard(boards[0])
 						enemyattackboard.setboard(boards[1])
 
-				drawboards_multi(playerattackboard, enemyattackboard, screen, XMARGIN, XMARGIN2)
+				drawboards_multi(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
 
 			if (place == 6):
 			# waiting for server to signal game is started
