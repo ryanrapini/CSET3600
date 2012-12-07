@@ -553,20 +553,20 @@ def log_message(message, board=None):
 	If run with one argument, print out that argument as a text message.
 	If the message argument is empty or none, clear the file.
 	"""
-		if board:
-			f = open('logfile.txt','a', encoding='utf8')
-			f.write('{}\n'.format(message))
-			for row in board:
-				f.write(" ".join(str(item) for item in row))
-				f.write('\n')
-			f.close()
-		elif message:
-			f = open('logfile.txt','a', encoding='utf8')
-			f.write('{}\n'.format(message))
-			f.close()
-		else:
-			f = open(filename, 'w')
-			f.close()
+	if board:
+		f = open('logfile.txt','a', encoding='utf8')
+		f.write('{}\n'.format(message))
+		for row in board:
+			f.write(" ".join(str(item) for item in row))
+			f.write('\n')
+		f.close()
+	elif message:
+		f = open('logfile.txt','a', encoding='utf8')
+		f.write('{}\n'.format(message))
+		f.close()
+	else:
+		f = open(filename, 'w')
+		f.close()
 
 
 def main(argv):
