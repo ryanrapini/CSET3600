@@ -46,4 +46,4 @@ Thumbs.db
 __pycache__/
 logfile.txt
 
-build\exe.win32-3.2\*
+exe.win32-3.2
