@@ -35,7 +35,6 @@ import sys
 import threading
 import queue
 from threading import Thread
-import pprint
 
 class Server(threading.Thread):
 	def __init__(self, ip):
@@ -97,9 +96,6 @@ class Server(threading.Thread):
 					self.client2_submit = True
 					self.turn = 1
 					self.status = 2
-					pp = pprint.PrettyPrinter(indent=4)
-					for item in self.gameboards:
-						pp.pprint(item)
 				else:
 					if self.turn == 1:
 						self.gameboards[1] = sent_move[1]

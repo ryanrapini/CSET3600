@@ -5,7 +5,7 @@ from AI import *
 from server import *
 from client import *
 import pickle
-import pprint
+import pygame._view
 
 color = {
 'black' : (0, 0, 0),
@@ -830,8 +830,6 @@ def main(argv):
 
 		if (gamemode == 3):
 
-			pp = pprint.PrettyPrinter(indent=4)
-
 			s = get_socket(ip)
 			preamble = get_preamble(s)
 			status, turn = preamble.split('.')
@@ -921,8 +919,6 @@ def main(argv):
 					singleinstructions(screen, 'Please select spot on attack board to start game', '', 475, 500)
 					if (boxx != None and boxy != None) and mouseClicked:
 						place = place + 1
-						for item in gameboards:
-							pp.pprint(item)
 						temp = enemyboard.checkforhitormiss(boxx,boxy)
 						if (temp == 9):
 							pass

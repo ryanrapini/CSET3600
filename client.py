@@ -1,7 +1,6 @@
 # Client protocol for battleship
 import socket
 import pickle
-import pprint
 
 
 # def try_connect(ip):
@@ -89,8 +88,5 @@ if __name__ == "__main__":
 
 	# if send_boards(s, gameboards):
 	# 	print ("Move submitted!")
-
-	# pp = pprint.PrettyPrinter(indent=4)
-	# pp.pprint (board)
 
 	s.close()
