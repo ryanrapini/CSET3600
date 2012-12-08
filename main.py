@@ -312,6 +312,16 @@ def singleinstructions(screen, text, text2, yloc, yloc2):
 	screen.blit(label2, (20, yloc2))
 
 
+def multiinstructions(screen, text, text2, xloc, xloc2):
+	"""Displays the instuctions for single play mode."""
+	single(screen)
+	myfont = pygame.font.SysFont('resources/alphbeta.ttf', 25)
+	label = myfont.render(text, 1, (255,0,0))
+	screen.blit(label, (xloc, 475))
+	label2 = myfont.render(text2, 1, (255,0,0))
+	screen.blit(label2, (xloc2, 500))
+
+
 def printstatus(screen, text):
 	"""Displays the current status of play.
 
@@ -886,15 +896,15 @@ def main(argv):
 				gamestarted = True
 
 			if (place == 0):
-				singleinstructions(screen, 'Please place the Aircraft Carrier on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+				multiinstructions(screen, 'Please place the Aircraft Carrier on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 200, 20)
 			elif (place == 1):
-				singleinstructions(screen, 'Please place the Battleship on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+				multiinstructions(screen, 'Please place the Battleship on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 200, 20)
 			elif (place == 2):
-				singleinstructions(screen, 'Please place the Submarine on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+				multiinstructions(screen, 'Please place the Submarine on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 200, 20)
 			elif (place == 3):
-				singleinstructions(screen, 'Please place the Destroyer on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+				multiinstructions(screen, 'Please place the Destroyer on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 200, 20)
 			elif (place == 4):
-				singleinstructions(screen, 'Please place the Patrol Boat on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
+				multiinstructions(screen, 'Please place the Patrol Boat on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 200, 20)
 
 			
 			boxx, boxy = whatbox(mousex, mousey, XMARGIN)
@@ -943,7 +953,7 @@ def main(argv):
 			# game ready to play
 			if (place > 6):
 				if (turn == playernumber):
-					singleinstructions(screen, 'Please select spot on attack board to start game', '', 475, 500)
+					multiinstructions(screen, 'Please select spot on attack board to start game', '', 100, 500)
 					if (boxx != None and boxy != None) and mouseClicked:
 						shipmessage = ''
 						place = place + 1
@@ -973,7 +983,7 @@ def main(argv):
 
 				else:
 					#waiting for other player to play, don't accept clicks
-					singleinstructions(screen, 'Please wait for your opponent to play!', shipmessage, 475, 500)
+					multiinstructions(screen, 'Please wait for your opponent to play!', shipmessage, 200, 250)
 					if (playernumber == 1):
 						playerboard.setboard(boards[0])
 						playerattackboard.setboard(boards[1])
@@ -989,7 +999,7 @@ def main(argv):
 
 			if (place == 6):
 			# waiting for server to signal game is started
-				singleinstructions(screen, 'All Set!', 'Waiting for the other player to finish placing their ships...', 475, 500)
+				multiinstructions(screen, 'All Set!', 'Waiting for the other player to finish placing their ships...', 300, 20)
 
 				if (status == 2):
 					s.close()
@@ -1011,7 +1021,7 @@ def main(argv):
 			if (place == 5):
 				
 
-				singleinstructions(screen, 'All Set!', 'Waiting for the other player to finish placing their ships...', 475, 500)
+				multiinstructions(screen, 'All Set!', 'Waiting for the other player to finish placing their ships...', 300, 20)
 				if (turn == playernumber):
 					print ("Player ready", playernumber)
 					gameboards = [playerboard.returnboard(), playerattackboard.returnboard(), enemyboard.returnboard(), enemyattackboard.returnboard()]
