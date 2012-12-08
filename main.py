@@ -363,16 +363,7 @@ def multi(screen, enteredip, mousex = -1, mousey = -1, mouseClicked = False):
 	ip = "Unknown"
 	ip = getIP()
 
-	mainstring = "Welcome to Battleship Multiplayer!\
-	\n\n===== Instructions =====\
-	\n\nIn order for multiplayer to work, you must have an internet connection (duh!)\
-	\n\nIf you are planning to host the server, then give your IP address (shown below!) to your friend and then click the 'Create Server' button.\
-	\n\nIf you are connecting to a friend's server, type in your friend's IP address in the box below, and then click the 'Join Server' button.\
-	\n\nThere is a 60 second time limit on moves or your turn will be forfeit! If you forfeit three turns in a row, you will lose the game!\
-	\n\n===== Information =====\
-	\n\nTesting for a network connection: {0}\
-	\n\nYour IP is: {1}\
-	\n\n".format(netstatus, ip)
+	mainstring = "Welcome to Battleship Multiplayer!\n\n===== Instructions =====\n\nIn order for multiplayer to work, you must have an internet connection (duh!)\n\nIf you are planning to host the server, then give your IP address (shown below!) to your friend and then click the 'Create Server' button.\n\nIf you are connecting to a friend's server, type in your friend's IP address in the box below, and then click the 'Join Server' button.\n\n===== Information =====\n\nTesting for a network connection: {0}\n\nYour IP is: {1}\n\n".format(netstatus, ip)
 	stringrect = pygame.Rect((45, 45, 710, 450))
 
 	offset = 10
