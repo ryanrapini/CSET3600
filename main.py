@@ -323,6 +323,7 @@ def printstatus(screen, text):
 	myfont = pygame.font.SysFont('resources/alphbeta.ttf', 25)
 	label4 = myfont.render(text, 1, (255,0,0))
 	screen.blit(label4, (200, 475))
+	print(text)
 
 
 def textbox(screen, position, message):
@@ -527,6 +528,31 @@ def checkforshipsunk(board, piece, screen):
 			printstatus(screen, 'You sunk my Patrol Boat!')
 
 
+
+
+def checkforshipsunk_multi(board, piece, screen):
+	"""Checking for a sunk ship on attack and player boards."""
+	sunk = False
+	hold = 0
+	for x in range(BOARDWIDTH):
+		for y in range(BOARDHEIGHT):
+			if (board.returnpiece(x,y) == piece):
+			   hold = hold + 1
+	if (hold == piece):
+		if (piece == 6):
+			return 'You sunk my Aircraft Carrier!'
+		elif (piece == 5):
+			return 'You sunk my Battleship!'
+		elif (piece == 4):
+			return 'You sunk my Submarine!'
+		elif (piece == 3):
+			return 'You sunk my Destroyer!'
+		elif (piece == 2):
+			return 'You sunk my Patrol Boat!'
+		else:
+			return None
+
+
 def whereisbox(boxx, boxy, xm):
 	# Convert board coordinates to pixel coordinates
 	left = boxx * (BOXSIZE + GAPSIZE) + xm
@@ -613,6 +639,8 @@ def main(argv):
 	spacetaken = 0
 	direction = 0
 	turn = 0
+	temp = 0
+	shipmessage =''
 	hit = pygame.mixer.Sound('resources\hit.ogg')
 	miss = pygame.mixer.Sound('resources\miss.ogg')
 	music = pygame.mixer.Sound('resources\TheLibertyBellMarch.ogg')
@@ -707,7 +735,6 @@ def main(argv):
 				comp = AI()
 				comp.placeships(shiparray, cpuboard)
 				gamestarted = True
-
 			if (place == 0):
 				singleinstructions(screen, 'Please place the Aircraft Carrier on your board!', 'Click to place ships down from point, hold space and click to place ships right from point', 475, 500)
 			elif (place == 1):
@@ -873,7 +900,7 @@ def main(argv):
 			boxx, boxy = whatbox(mousex, mousey, XMARGIN)
 			boxx2, boxy2 = whatbox(mousex, mousey, XMARGIN2)
 			# user places ships on board
-			if (place < 5):
+			if (place < 5 and place >= 0):
 				drawboards(playerattackboard, playerboard, screen, XMARGIN, XMARGIN2)
 				if boxx2 != None and boxy2 != None and mouseClicked:
 					checkplace = 0
@@ -934,17 +961,18 @@ def main(argv):
 								hit.play(loops = 0)
 
 							if (checkforwin(playerattackboard)):
-								printstatus(screen, 'You win!')
-								turn = -1
+								place = -1
 							else:
-								checkforshipsunk(playerattackboard, temp, screen)
-								turn = 1
+								temp_shipmessage = checkforshipsunk_multi(playerattackboard, temp, screen)
+								if temp_shipmessage:
+									shipmessage = temp_shipmessage
+
 						gameboards = [playerboard.returnboard(), playerattackboard.returnboard(), enemyboard.returnboard(), enemyattackboard.returnboard()]
 						send_boards(s, gameboards)
 
 				else:
 					#waiting for other player to play, don't accept clicks
-					singleinstructions(screen, 'Please wait for your opponent to play!', '', 475, 500)
+					singleinstructions(screen, 'Please wait for your opponent to play!', shipmessage, 475, 500)
 					if (playernumber == 1):
 						playerboard.setboard(boards[0])
 						playerattackboard.setboard(boards[1])
@@ -988,6 +1016,10 @@ def main(argv):
 					gameboards = [playerboard.returnboard(), playerattackboard.returnboard(), enemyboard.returnboard(), enemyattackboard.returnboard()]
 					send_boards(s, gameboards)
 					place += 1
+
+			if (place == -1):
+				printstatus(screen, 'You win!')
+
 			s.close()
 
 		# If we're in gamemode 4, we're quitting
