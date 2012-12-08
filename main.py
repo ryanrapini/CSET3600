@@ -62,6 +62,7 @@ def getIP():
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	s.connect(('google.com', 0))
 	return s.getsockname()[0]
+	s.close()
 
 
 def init():
@@ -567,7 +568,7 @@ def multi_game_init(ip):
 		# Spawn a server process, leave it alone.
 		print ("Starting Server...")
 		ip = getIP()
-		serv = Server()
+		serv = Server(ip)
 		servthread = Thread(target=serv.listen, args=())
 		servthread.start()
 
