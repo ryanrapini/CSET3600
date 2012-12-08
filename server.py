@@ -38,9 +38,10 @@ from threading import Thread
 import pprint
 
 class Server(threading.Thread):
-	def __init__(self):
+	def __init__(self, ip):
 		self.gameboards = [[[0 for i in range(10)] for j in range(10)] for k in range (4)]
-		self.HOST = '192.168.1.107'
+
+		self.HOST = ip
 		self.PORT = 58008
 		self.status = 1
 		self.turn = 1
@@ -165,6 +166,6 @@ def clientthread(conn, preamble, gameboards,q):
 	q.put(submitted)
 
 if __name__ == "__main__":
-	serv = Server()
+	serv = Server('192.168.1.107')
 	servthread = Thread(target=serv.listen, args=())
 	servthread.start()
