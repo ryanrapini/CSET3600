@@ -945,6 +945,7 @@ def main(argv):
 				if (turn == playernumber):
 					singleinstructions(screen, 'Please select spot on attack board to start game', '', 475, 500)
 					if (boxx != None and boxy != None) and mouseClicked:
+						shipmessage = ''
 						place = place + 1
 						temp = enemyboard.checkforhitormiss(boxx,boxy)
 						if (temp == 9):
