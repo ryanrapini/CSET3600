@@ -459,6 +459,7 @@ def drawboards(attackboard, playerboard, screen, xm1, xm2):
 			elif (playerboard.returnpiece(x,y) == 8):
 				pygame.draw.rect(screen, HITCOLOR, (left2, top2, BOXSIZE, BOXSIZE))
 
+
 def drawboards_multi(attackboard, playerboard, screen, xm1, xm2):
 	"""Drawing of the attckboard player board, and screen are defined.
 
@@ -538,8 +539,6 @@ def checkforshipsunk(board, piece, screen):
 			printstatus(screen, 'You sunk my Patrol Boat!')
 
 
-
-
 def checkforshipsunk_multi(board, piece, screen):
 	"""Checking for a sunk ship on attack and player boards."""
 	sunk = False
@@ -550,15 +549,15 @@ def checkforshipsunk_multi(board, piece, screen):
 			   hold = hold + 1
 	if (hold == piece):
 		if (piece == 6):
-			return 'You sunk my Aircraft Carrier!'
+			return 'You sunk an enemy Aircraft Carrier!'
 		elif (piece == 5):
-			return 'You sunk my Battleship!'
+			return 'You sunk an enemy Battleship!'
 		elif (piece == 4):
-			return 'You sunk my Submarine!'
+			return 'You sunk an enemy Submarine!'
 		elif (piece == 3):
-			return 'You sunk my Destroyer!'
+			return 'You sunk an enemy Destroyer!'
 		elif (piece == 2):
-			return 'You sunk my Patrol Boat!'
+			return 'You sunk an enemy Patrol Boat!'
 		else:
 			return None
 
